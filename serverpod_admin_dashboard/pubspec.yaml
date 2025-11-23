@@ -1,8 +1,7 @@
 name: serverpod_admin_dashboard
 description: Reusable Serverpod admin dashboard widget.
 version: 0.1.0
-publish_to: 'none'
-
+homepage: https://github.com/AdamMusa/serverpod_admin_dashboard
 environment:
   sdk: '>=3.5.0 <4.0.0'
   flutter: '>=3.24.0'
