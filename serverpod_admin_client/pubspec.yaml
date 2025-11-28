@@ -1,8 +1,8 @@
 name: serverpod_admin_client
 description: Starting point for a Serverpod module client.
-version: 1.0.0
+version: 1.0.2
 # homepage: https://www.example.com
-homepage: https://github.com/AdamMusa/serverpod_admin_dashboard
+homepage: https://github.com/AdamMusa/serverpod_admin
 
 environment:
   sdk: '>=3.5.0 <4.0.0'

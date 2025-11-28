@@ -120,6 +120,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           themeMode: _controller.themeMode,
           theme: _lightTheme,
           darkTheme: _darkTheme,
+          debugShowCheckedModeBanner: false,
           home: Home(
             controller: _controller,
           ),

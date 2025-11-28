@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:serverpod_admin_dashboard/src/controller/admin_dashboard.dart';
 import 'package:serverpod_admin_dashboard/src/helpers/admin_resources.dart';
 import 'package:serverpod_admin_dashboard/src/widgets/record_dialog.dart';
-import 'package:serverpod_admin_dashboard/src/screens/record_details.dart';
 
 /// Business logic operations for the Home screen.
 /// Separated from UI to avoid setState usage.
@@ -55,16 +54,7 @@ class HomeOperations {
     AdminResource resource,
     Map<String, String> record,
   ) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => RecordDetails(
-          resource: resource,
-          record: record,
-          onEdit: (record) => showEditDialog(resource, record),
-          onDelete: (record) => showDeleteConfirmation(resource, record),
-        ),
-      ),
-    );
+    controller.openDetails(resource, record);
   }
 
   /// Shows the delete confirmation dialog.
@@ -156,6 +146,17 @@ class HomeOperations {
         'Unable to resolve primary key for ${resource.key}, aborting delete.',
       );
       return;
+    }
+
+    // Close details if the deleted record is currently being viewed
+    if (controller.isShowingDetails &&
+        controller.detailsResource?.key == resource.key &&
+        controller.detailsRecord != null) {
+      final detailsPrimaryKey = controller.resolvePrimaryKeyValue(
+          resource, controller.detailsRecord!);
+      if (detailsPrimaryKey == primaryValue) {
+        controller.closeDetails();
+      }
     }
 
     try {

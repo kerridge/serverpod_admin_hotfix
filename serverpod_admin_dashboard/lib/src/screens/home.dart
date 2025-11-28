@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:serverpod_admin_dashboard/src/controller/admin_dashboard.dart';
 import 'package:serverpod_admin_dashboard/src/screens/home_operations.dart';
+import 'package:serverpod_admin_dashboard/src/screens/record_details.dart';
 import 'package:serverpod_admin_dashboard/src/widgets/footer.dart';
 import 'package:serverpod_admin_dashboard/src/widgets/records_pane.dart';
 import 'package:serverpod_admin_dashboard/src/widgets/side_bar.dart';
@@ -118,13 +119,46 @@ class _HomeState extends State<Home> {
                       children: [
                         Expanded(
                           child: isSmallScreen
-                              ? RecordsPane(
-                                  resource: widget.controller.selectedResource,
-                                  records: widget.controller.records,
-                                  isLoading: widget.controller.isRecordsLoading,
-                                  errorMessage: widget.controller.recordsError,
-                                  onAdd:
-                                      widget.controller.selectedResource == null
+                              ? widget.controller.isShowingDetails &&
+                                      widget.controller.detailsResource !=
+                                          null &&
+                                      widget.controller.detailsRecord != null
+                                  ? RecordDetails(
+                                      resource:
+                                          widget.controller.detailsResource!,
+                                      record: widget.controller.detailsRecord!,
+                                      showAppBar: false,
+                                      onBack: () {
+                                        widget.controller.closeDetails();
+                                      },
+                                      onEdit: (record) {
+                                        final resource =
+                                            widget.controller.detailsResource;
+                                        if (resource != null) {
+                                          operations.showEditDialog(
+                                              resource, record);
+                                        }
+                                      },
+                                      onDelete: (record) {
+                                        final resource =
+                                            widget.controller.detailsResource;
+                                        if (resource != null) {
+                                          operations.showDeleteConfirmation(
+                                              resource, record);
+                                        }
+                                      },
+                                    )
+                                  : RecordsPane(
+                                      resource:
+                                          widget.controller.selectedResource,
+                                      records: widget.controller.records,
+                                      isLoading:
+                                          widget.controller.isRecordsLoading,
+                                      errorMessage:
+                                          widget.controller.recordsError,
+                                      onAdd: widget.controller
+                                                  .selectedResource ==
+                                              null
                                           ? null
                                           : () {
                                               final resource = widget
@@ -134,41 +168,47 @@ class _HomeState extends State<Home> {
                                                     .showCreateDialog(resource);
                                               }
                                             },
-                                  onEdit:
-                                      widget.controller.selectedResource == null
-                                          ? null
-                                          : (record) {
-                                              final resource = widget
-                                                  .controller.selectedResource;
-                                              if (resource != null) {
-                                                operations.showEditDialog(
-                                                    resource, record);
-                                              }
-                                            },
-                                  onDelete:
-                                      widget.controller.selectedResource == null
-                                          ? null
-                                          : (record) {
-                                              final resource = widget
-                                                  .controller.selectedResource;
-                                              if (resource != null) {
-                                                operations
-                                                    .showDeleteConfirmation(
+                                      onEdit:
+                                          widget.controller.selectedResource ==
+                                                  null
+                                              ? null
+                                              : (record) {
+                                                  final resource = widget
+                                                      .controller
+                                                      .selectedResource;
+                                                  if (resource != null) {
+                                                    operations.showEditDialog(
                                                         resource, record);
-                                              }
-                                            },
-                                  onView:
-                                      widget.controller.selectedResource == null
-                                          ? null
-                                          : (record) {
-                                              final resource = widget
-                                                  .controller.selectedResource;
-                                              if (resource != null) {
-                                                operations.showDetailsPage(
-                                                    resource, record);
-                                              }
-                                            },
-                                )
+                                                  }
+                                                },
+                                      onDelete:
+                                          widget.controller.selectedResource ==
+                                                  null
+                                              ? null
+                                              : (record) {
+                                                  final resource = widget
+                                                      .controller
+                                                      .selectedResource;
+                                                  if (resource != null) {
+                                                    operations
+                                                        .showDeleteConfirmation(
+                                                            resource, record);
+                                                  }
+                                                },
+                                      onView:
+                                          widget.controller.selectedResource ==
+                                                  null
+                                              ? null
+                                              : (record) {
+                                                  final resource = widget
+                                                      .controller
+                                                      .selectedResource;
+                                                  if (resource != null) {
+                                                    operations.showDetailsPage(
+                                                        resource, record);
+                                                  }
+                                                },
+                                    )
                               : Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -209,68 +249,110 @@ class _HomeState extends State<Home> {
                                       ),
                                     const SizedBox(width: 20),
                                     Expanded(
-                                      child: RecordsPane(
-                                        resource:
-                                            widget.controller.selectedResource,
-                                        records: widget.controller.records,
-                                        isLoading:
-                                            widget.controller.isRecordsLoading,
-                                        errorMessage:
-                                            widget.controller.recordsError,
-                                        onAdd: widget.controller
-                                                    .selectedResource ==
-                                                null
-                                            ? null
-                                            : () {
-                                                final resource = widget
-                                                    .controller
-                                                    .selectedResource;
-                                                if (resource != null) {
-                                                  operations.showCreateDialog(
-                                                      resource);
-                                                }
+                                      child: widget.controller
+                                                  .isShowingDetails &&
+                                              widget.controller
+                                                      .detailsResource !=
+                                                  null &&
+                                              widget.controller.detailsRecord !=
+                                                  null
+                                          ? RecordDetails(
+                                              resource: widget
+                                                  .controller.detailsResource!,
+                                              record: widget
+                                                  .controller.detailsRecord!,
+                                              showAppBar: false,
+                                              onBack: () {
+                                                widget.controller
+                                                    .closeDetails();
                                               },
-                                        onEdit: widget.controller
-                                                    .selectedResource ==
-                                                null
-                                            ? null
-                                            : (record) {
+                                              onEdit: (record) {
                                                 final resource = widget
-                                                    .controller
-                                                    .selectedResource;
+                                                    .controller.detailsResource;
                                                 if (resource != null) {
                                                   operations.showEditDialog(
                                                       resource, record);
                                                 }
                                               },
-                                        onDelete: widget.controller
-                                                    .selectedResource ==
-                                                null
-                                            ? null
-                                            : (record) {
+                                              onDelete: (record) {
                                                 final resource = widget
-                                                    .controller
-                                                    .selectedResource;
+                                                    .controller.detailsResource;
                                                 if (resource != null) {
                                                   operations
                                                       .showDeleteConfirmation(
                                                           resource, record);
                                                 }
                                               },
-                                        onView: widget.controller
-                                                    .selectedResource ==
-                                                null
-                                            ? null
-                                            : (record) {
-                                                final resource = widget
-                                                    .controller
-                                                    .selectedResource;
-                                                if (resource != null) {
-                                                  operations.showDetailsPage(
-                                                      resource, record);
-                                                }
-                                              },
-                                      ),
+                                            )
+                                          : RecordsPane(
+                                              resource: widget
+                                                  .controller.selectedResource,
+                                              records:
+                                                  widget.controller.records,
+                                              isLoading: widget
+                                                  .controller.isRecordsLoading,
+                                              errorMessage: widget
+                                                  .controller.recordsError,
+                                              onAdd: widget.controller
+                                                          .selectedResource ==
+                                                      null
+                                                  ? null
+                                                  : () {
+                                                      final resource = widget
+                                                          .controller
+                                                          .selectedResource;
+                                                      if (resource != null) {
+                                                        operations
+                                                            .showCreateDialog(
+                                                                resource);
+                                                      }
+                                                    },
+                                              onEdit: widget.controller
+                                                          .selectedResource ==
+                                                      null
+                                                  ? null
+                                                  : (record) {
+                                                      final resource = widget
+                                                          .controller
+                                                          .selectedResource;
+                                                      if (resource != null) {
+                                                        operations
+                                                            .showEditDialog(
+                                                                resource,
+                                                                record);
+                                                      }
+                                                    },
+                                              onDelete: widget.controller
+                                                          .selectedResource ==
+                                                      null
+                                                  ? null
+                                                  : (record) {
+                                                      final resource = widget
+                                                          .controller
+                                                          .selectedResource;
+                                                      if (resource != null) {
+                                                        operations
+                                                            .showDeleteConfirmation(
+                                                                resource,
+                                                                record);
+                                                      }
+                                                    },
+                                              onView: widget.controller
+                                                          .selectedResource ==
+                                                      null
+                                                  ? null
+                                                  : (record) {
+                                                      final resource = widget
+                                                          .controller
+                                                          .selectedResource;
+                                                      if (resource != null) {
+                                                        operations
+                                                            .showDetailsPage(
+                                                                resource,
+                                                                record);
+                                                      }
+                                                    },
+                                            ),
                                     ),
                                   ],
                                 ),

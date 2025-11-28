@@ -153,6 +153,9 @@ class _RecordsBodyState extends State<RecordsBody> {
                                             ),
                                           ),
                                         ),
+                                        onTap: widget.onView != null
+                                            ? () => widget.onView!(record)
+                                            : null,
                                       ),
                                     )
                                     .toList()

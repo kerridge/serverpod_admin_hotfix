@@ -8,116 +8,153 @@ class RecordDetails extends StatelessWidget {
     required this.record,
     this.onEdit,
     this.onDelete,
+    this.onBack,
+    this.showAppBar = true,
   });
 
   final AdminResource resource;
   final Map<String, String> record;
   final void Function(Map<String, String> record)? onEdit;
   final void Function(Map<String, String> record)? onDelete;
+  final VoidCallback? onBack;
+  final bool showAppBar;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final columns = resource.columns;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('${resource.tableName} Details'),
-        actions: [
-          if (onEdit != null)
-            IconButton(
-              tooltip: 'Edit record',
-              icon: const Icon(Icons.edit_outlined),
-              onPressed: () {
-                Navigator.of(context).pop();
-                onEdit!(record);
-              },
-            ),
-          if (onDelete != null)
-            IconButton(
-              tooltip: 'Delete record',
-              icon: Icon(
-                Icons.delete_outline,
-                color: theme.colorScheme.error,
+    final cardContent = Card(
+      margin: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header matching RecordsPane design
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(18),
               ),
-              onPressed: () {
-                Navigator.of(context).pop();
-                onDelete!(record);
-              },
+              color: theme.colorScheme.primary.withOpacity(0.06),
             ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 800),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Header
-                      Row(
-                        children: [
-                          Container(
-                            height: 48,
-                            width: 48,
-                            decoration: BoxDecoration(
-                              color:
-                                  theme.colorScheme.primary.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              Icons.info_outline,
-                              color: theme.colorScheme.primary,
-                              size: 28,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        if (!showAppBar && onBack != null)
+                          IconButton(
+                            tooltip: 'Back',
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: onBack,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            style: IconButton.styleFrom(
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  resource.tableName,
-                                  style:
-                                      theme.textTheme.headlineSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Record Details',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.textTheme.bodyMedium?.color
-                                        ?.withOpacity(0.7),
-                                  ),
-                                ),
-                              ],
-                            ),
+                        if (!showAppBar && onBack != null)
+                          const SizedBox(width: 8),
+                        Text(
+                          resource.tableName,
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Chip(
+                          label: const Text(
+                            'Record Details',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          avatar: const Icon(Icons.info_outline, size: 18),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (!showAppBar && onEdit != null)
+                      IconButton(
+                        tooltip: 'Edit record',
+                        icon: const Icon(Icons.edit_outlined),
+                        onPressed: () => onEdit!(record),
                       ),
-                      const SizedBox(height: 32),
-                      const Divider(),
-                      const SizedBox(height: 24),
-                      // Fields
-                      ...columns.map((column) {
+                    if (!showAppBar && onDelete != null)
+                      IconButton(
+                        tooltip: 'Delete record',
+                        icon: Icon(
+                          Icons.delete_outline,
+                          color: theme.colorScheme.error,
+                        ),
+                        onPressed: () => onDelete!(record),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, thickness: 1),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: SingleChildScrollView(
+                child: DataTableTheme(
+                  data: DataTableThemeData(
+                    headingTextStyle: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                    headingRowColor: WidgetStateProperty.resolveWith(
+                      (states) =>
+                          theme.colorScheme.secondary.withOpacity(0.08),
+                    ),
+                    dataTextStyle: theme.textTheme.bodyMedium,
+                    dividerThickness: 0.6,
+                  ),
+                  child: DataTable(
+                      columnSpacing: 36,
+                      horizontalMargin: 20,
+                      columns: const [
+                        DataColumn(
+                          label: Row(
+                            children: [
+                              Icon(Icons.view_column_outlined, size: 16),
+                              SizedBox(width: 8),
+                              Text('Field'),
+                            ],
+                          ),
+                        ),
+                        DataColumn(
+                          label: Row(
+                            children: [
+                              Icon(Icons.view_column_outlined, size: 16),
+                              SizedBox(width: 8),
+                              Text('Value'),
+                            ],
+                          ),
+                        ),
+                      ],
+                      rows: columns.map((column) {
                         final value = record[column.name];
                         final formattedValue = formatRecordValue(column, value);
                         final isEmpty = formattedValue.isEmpty;
                         final isPrimary = column.isPrimary;
 
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                        return DataRow(
+                          cells: [
+                            DataCell(
                               Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
                                     isPrimary
@@ -143,7 +180,7 @@ class RecordDetails extends StatelessWidget {
                                     const SizedBox(width: 8),
                                     Chip(
                                       label: const Text(
-                                        'Primary Key',
+                                        'PK',
                                         style: TextStyle(fontSize: 10),
                                       ),
                                       padding: EdgeInsets.zero,
@@ -176,44 +213,80 @@ class RecordDetails extends StatelessWidget {
                                   ],
                                 ],
                               ),
-                              const SizedBox(height: 8),
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: isEmpty
-                                      ? theme.colorScheme.surface
-                                      : theme
-                                          .colorScheme.surfaceContainerHighest,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: isEmpty
-                                        ? theme.dividerColor.withOpacity(0.2)
-                                        : theme.dividerColor.withOpacity(0.3),
-                                  ),
-                                ),
+                            ),
+                            DataCell(
+                              ConstrainedBox(
+                                constraints: const BoxConstraints(minWidth: 200),
                                 child: Text(
                                   isEmpty ? '(empty)' : formattedValue,
-                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                  style: theme.textTheme.bodyMedium?.copyWith(
                                     color: isEmpty
-                                        ? theme.textTheme.bodyLarge?.color
+                                        ? theme.textTheme.bodyMedium?.color
                                             ?.withOpacity(0.5)
                                         : null,
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         );
                       }).toList(),
-                    ],
                   ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
+
+    final content = showAppBar
+        ? Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: cardContent,
+            ),
+          )
+        : cardContent;
+
+    if (showAppBar) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('${resource.tableName} Details'),
+          actions: [
+            if (onEdit != null)
+              IconButton(
+                tooltip: 'Edit record',
+                icon: const Icon(Icons.edit_outlined),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onEdit!(record);
+                },
+              ),
+            if (onDelete != null)
+              IconButton(
+                tooltip: 'Delete record',
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: theme.colorScheme.error,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onDelete!(record);
+                },
+              ),
+            const SizedBox(width: 8),
+          ],
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: content,
+          ),
+        ),
+      );
+    }
+
+    return content;
   }
 }

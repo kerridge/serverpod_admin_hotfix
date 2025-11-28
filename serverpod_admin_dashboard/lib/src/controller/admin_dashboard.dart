@@ -30,6 +30,24 @@ class AdminDashboardController extends ChangeNotifier {
   String? recordsError;
   bool isRecordsLoading = false;
 
+  // Details state
+  AdminResource? detailsResource;
+  Map<String, String>? detailsRecord;
+
+  bool get isShowingDetails => detailsResource != null && detailsRecord != null;
+
+  void openDetails(AdminResource resource, Map<String, String> record) {
+    detailsResource = resource;
+    detailsRecord = record;
+    notifyListeners();
+  }
+
+  void closeDetails() {
+    detailsResource = null;
+    detailsRecord = null;
+    notifyListeners();
+  }
+
   void toggleThemeMode() {
     _themeMode =
         _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
@@ -87,6 +105,7 @@ class AdminDashboardController extends ChangeNotifier {
 
   Future<void> selectResource(AdminResource resource) async {
     selectedResource = resource;
+    closeDetails(); // Close details when changing resource
     notifyListeners();
     await loadRecords(resource);
   }
@@ -100,6 +119,24 @@ class AdminDashboardController extends ChangeNotifier {
       final loaded = await adminEndpoint.list(resource.key);
       records = loaded;
       recordsError = null;
+      
+      // Update details record if it's the same resource and record still exists
+      if (isShowingDetails && 
+          detailsResource?.key == resource.key &&
+          detailsRecord != null) {
+        final primaryKey = resolvePrimaryKeyValue(resource, detailsRecord!);
+        if (primaryKey != null) {
+          try {
+            final updatedRecord = loaded.firstWhere(
+              (record) => resolvePrimaryKeyValue(resource, record) == primaryKey,
+            );
+            detailsRecord = updatedRecord;
+          } catch (_) {
+            // Record was deleted, close details
+            closeDetails();
+          }
+        }
+      }
     } catch (error) {
       recordsError =
           'Unable to load ${resource.tableName} records. Please try again.';
@@ -124,6 +161,21 @@ class AdminDashboardController extends ChangeNotifier {
   ) async {
     await adminEndpoint.update(resource.key, payload);
     await loadRecords(resource);
+    
+    // Update details record if it's the same record being edited
+    if (isShowingDetails && 
+        detailsResource?.key == resource.key &&
+        detailsRecord != null) {
+      final primaryKey = resolvePrimaryKeyValue(resource, detailsRecord!);
+      final updatedPrimaryKey = resolvePrimaryKeyValue(resource, payload);
+      if (primaryKey != null && 
+          updatedPrimaryKey != null && 
+          primaryKey == updatedPrimaryKey) {
+        // Update the displayed record with the new values
+        detailsRecord = payload;
+        notifyListeners();
+      }
+    }
   }
 
   Future<void> deleteRecord(

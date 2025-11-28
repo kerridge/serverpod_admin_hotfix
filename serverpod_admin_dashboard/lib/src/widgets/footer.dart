@@ -25,7 +25,7 @@ class Footer extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            'Brought to you by the Serverpod team with love',
+            'Brought to you with love by Izeesoft',
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
