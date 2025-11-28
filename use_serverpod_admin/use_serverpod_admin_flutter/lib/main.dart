@@ -36,49 +36,53 @@ void main() {
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
+      // home: AdminDashboard(
+      //   client: client,
+      //   customSidebarBuilder: (context, controller) {
+      //     return CustomSidebar(controller: controller);
+      //   },
+      //   customBodyBuilder: (context, controller, operations) {
+      //     return CustomBody(
+      //       controller: controller,
+      //       operations: operations,
+      //     );
+      //   },
+      //   customDetailsBuilder:
+      //       (context, controller, operations, resource, record) {
+      //     return CustomDetails(
+      //       controller: controller,
+      //       operations: operations,
+      //       resource: resource,
+      //       record: record,
+      //     );
+      //   },
+      //   customEditDialogBuilder: (context, controller, operations, resource,
+      //       currentValues, onSubmit) {
+      //     return CustomEditDialog(
+      //       resource: resource,
+      //       currentValues: currentValues,
+      //       onSubmit: onSubmit,
+      //     );
+      //   },
+      //   customDeleteDialogBuilder:
+      //       (context, controller, operations, resource, record, onConfirm) {
+      //     return CustomDeleteDialog(
+      //       resource: resource,
+      //       record: record,
+      //       onConfirm: onConfirm,
+      //     );
+      //   },
+      //   customCreateDialogBuilder:
+      //       (context, controller, operations, resource, onSubmit) {
+      //     return CustomCreateDialog(
+      //       resource: resource,
+      //       onSubmit: onSubmit,
+      //     );
+      //   },
+      // ),
+
       home: AdminDashboard(
         client: client,
-        customSidebarBuilder: (context, controller) {
-          return CustomSidebar(controller: controller);
-        },
-        customBodyBuilder: (context, controller, operations) {
-          return CustomBody(
-            controller: controller,
-            operations: operations,
-          );
-        },
-        customDetailsBuilder:
-            (context, controller, operations, resource, record) {
-          return CustomDetails(
-            controller: controller,
-            operations: operations,
-            resource: resource,
-            record: record,
-          );
-        },
-        customEditDialogBuilder: (context, controller, operations, resource,
-            currentValues, onSubmit) {
-          return CustomEditDialog(
-            resource: resource,
-            currentValues: currentValues,
-            onSubmit: onSubmit,
-          );
-        },
-        customDeleteDialogBuilder:
-            (context, controller, operations, resource, record, onConfirm) {
-          return CustomDeleteDialog(
-            resource: resource,
-            record: record,
-            onConfirm: onConfirm,
-          );
-        },
-        customCreateDialogBuilder:
-            (context, controller, operations, resource, onSubmit) {
-          return CustomCreateDialog(
-            resource: resource,
-            onSubmit: onSubmit,
-          );
-        },
       ),
     ),
   );

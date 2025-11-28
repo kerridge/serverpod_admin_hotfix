@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:serverpod_admin_dashboard/src/admin_dashboard.dart';
 import 'package:serverpod_admin_dashboard/src/controller/admin_dashboard.dart';
 import 'package:serverpod_admin_dashboard/src/helpers/admin_resources.dart';
-import 'package:serverpod_admin_dashboard/src/widgets/record_dialog.dart';
+import 'package:serverpod_admin_dashboard/src/widgets/default_create_dialog.dart';
+import 'package:serverpod_admin_dashboard/src/widgets/default_delete_dialog.dart';
+import 'package:serverpod_admin_dashboard/src/widgets/default_edit_dialog.dart';
 
 /// Business logic operations for the Home screen.
 /// Separated from UI to avoid setState usage.
@@ -39,10 +41,10 @@ class HomeOperations {
         // Records are reloaded in _createRecord
       }
     } else {
-      // Default implementation
+      // Default implementation with modern design
       final created = await showDialog<bool>(
         context: context,
-        builder: (context) => RecordDialog(
+        builder: (context) => DefaultCreateDialog(
           resource: resource,
           onSubmit: (payload) => _createRecord(resource, payload),
         ),
@@ -76,14 +78,13 @@ class HomeOperations {
         // Records are reloaded in _updateRecord
       }
     } else {
-      // Default implementation
+      // Default implementation with modern design
       final updated = await showDialog<bool>(
         context: context,
-        builder: (context) => RecordDialog(
+        builder: (context) => DefaultEditDialog(
           resource: resource,
+          currentValues: record,
           onSubmit: (payload) => _updateRecord(resource, payload),
-          initialValues: record,
-          isUpdate: true,
         ),
       );
 
@@ -123,32 +124,18 @@ class HomeOperations {
         // Deletion handled in the custom dialog's onConfirm callback
       }
     } else {
-      // Default implementation
+      // Default implementation with modern design
       final confirmed = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Delete from ${resource.tableName}?'),
-          content: const Text(
-            'This action cannot be undone. Are you sure you want to delete this record?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.error,
-              ),
-              child: const Text('Delete'),
-            ),
-          ],
+        builder: (context) => DefaultDeleteDialog(
+          resource: resource,
+          record: record,
+          onConfirm: () => _deleteRecord(resource, record),
         ),
       );
 
       if (confirmed == true) {
-        await _deleteRecord(resource, record);
+        // Deletion handled in the dialog's onConfirm callback
       }
     }
   }
