@@ -20,6 +20,29 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   HomeOperations? _operations;
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(
+      text: widget.controller.searchQuery,
+    );
+    widget.controller.addListener(_onControllerChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onControllerChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    if (_searchController.text != widget.controller.searchQuery) {
+      _searchController.text = widget.controller.searchQuery;
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -151,11 +174,20 @@ class _HomeState extends State<Home> {
                                   : RecordsPane(
                                       resource:
                                           widget.controller.selectedResource,
-                                      records: widget.controller.records,
+                                      records:
+                                          widget.controller.filteredRecords,
+                                      totalRecords:
+                                          widget.controller.records.length,
                                       isLoading:
                                           widget.controller.isRecordsLoading,
                                       errorMessage:
                                           widget.controller.recordsError,
+                                      searchQuery:
+                                          widget.controller.searchQuery,
+                                      onSearchChanged:
+                                          widget.controller.setSearchQuery,
+                                      onClearSearch:
+                                          widget.controller.clearSearch,
                                       onAdd: widget.controller
                                                   .selectedResource ==
                                               null
@@ -287,12 +319,20 @@ class _HomeState extends State<Home> {
                                           : RecordsPane(
                                               resource: widget
                                                   .controller.selectedResource,
-                                              records:
-                                                  widget.controller.records,
+                                              records: widget
+                                                  .controller.filteredRecords,
+                                              totalRecords: widget
+                                                  .controller.records.length,
                                               isLoading: widget
                                                   .controller.isRecordsLoading,
                                               errorMessage: widget
                                                   .controller.recordsError,
+                                              searchQuery:
+                                                  widget.controller.searchQuery,
+                                              onSearchChanged: widget
+                                                  .controller.setSearchQuery,
+                                              onClearSearch:
+                                                  widget.controller.clearSearch,
                                               onAdd: widget.controller
                                                           .selectedResource ==
                                                       null

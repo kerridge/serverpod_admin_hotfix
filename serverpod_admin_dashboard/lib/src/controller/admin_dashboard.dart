@@ -30,6 +30,31 @@ class AdminDashboardController extends ChangeNotifier {
   String? recordsError;
   bool isRecordsLoading = false;
 
+  // Search state
+  String _searchQuery = '';
+  String get searchQuery => _searchQuery;
+
+  List<Map<String, String>> get filteredRecords {
+    if (_searchQuery.isEmpty) return records;
+    
+    final query = _searchQuery.toLowerCase();
+    return records.where((record) {
+      return record.values.any((value) {
+        return value.toLowerCase().contains(query);
+      });
+    }).toList();
+  }
+
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    _searchQuery = '';
+    notifyListeners();
+  }
+
   // Details state
   AdminResource? detailsResource;
   Map<String, String>? detailsRecord;
@@ -106,6 +131,7 @@ class AdminDashboardController extends ChangeNotifier {
   Future<void> selectResource(AdminResource resource) async {
     selectedResource = resource;
     closeDetails(); // Close details when changing resource
+    clearSearch(); // Clear search when changing resource
     notifyListeners();
     await loadRecords(resource);
   }
