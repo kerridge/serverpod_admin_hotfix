@@ -5,7 +5,7 @@ import 'package:serverpod_admin_dashboard/src/helpers/admin_resources.dart';
 import 'package:serverpod_admin_dashboard/src/screens/home_operations.dart';
 import 'package:serverpod_admin_dashboard/src/screens/record_details.dart';
 import 'package:serverpod_admin_dashboard/src/widgets/footer.dart';
-import 'package:serverpod_admin_dashboard/src/widgets/records_pane.dart';
+import 'package:serverpod_admin_dashboard/src/widgets/records_view.dart';
 import 'package:serverpod_admin_dashboard/src/widgets/side_bar.dart';
 
 /// Builder function for custom records pane/body widget
@@ -166,8 +166,8 @@ class _HomeState extends State<Home> {
     );
   }
 
-  /// Builds the RecordsPane widget with common callbacks
-  Widget _buildRecordsPane() {
+  /// Builds the records view widget with common callbacks
+  Widget _buildRecordsView() {
     final selectedResource = widget.controller.selectedResource;
     if (selectedResource == null) {
       return const SizedBox.shrink();
@@ -183,7 +183,7 @@ class _HomeState extends State<Home> {
     }
 
     // Default implementation
-    return RecordsPane(
+    return RecordsView(
       resource: selectedResource,
       records: widget.controller.filteredRecords,
       totalRecords: widget.controller.records.length,
@@ -200,12 +200,12 @@ class _HomeState extends State<Home> {
     );
   }
 
-  /// Builds the main content area (RecordDetails or RecordsPane)
+  /// Builds the main content area (RecordDetails or RecordsView)
   Widget _buildMainContent() {
     if (widget.controller.isShowingDetails) {
       return _buildRecordDetails();
     }
-    return _buildRecordsPane();
+    return _buildRecordsView();
   }
 
   /// Builds the footer widget

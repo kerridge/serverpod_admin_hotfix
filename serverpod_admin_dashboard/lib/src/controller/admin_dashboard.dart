@@ -36,7 +36,7 @@ class AdminDashboardController extends ChangeNotifier {
 
   List<Map<String, String>> get filteredRecords {
     if (_searchQuery.isEmpty) return records;
-    
+
     final query = _searchQuery.toLowerCase();
     return records.where((record) {
       return record.values.any((value) {
@@ -145,16 +145,17 @@ class AdminDashboardController extends ChangeNotifier {
       final loaded = await adminEndpoint.list(resource.key);
       records = loaded;
       recordsError = null;
-      
+
       // Update details record if it's the same resource and record still exists
-      if (isShowingDetails && 
+      if (isShowingDetails &&
           detailsResource?.key == resource.key &&
           detailsRecord != null) {
         final primaryKey = resolvePrimaryKeyValue(resource, detailsRecord!);
         if (primaryKey != null) {
           try {
             final updatedRecord = loaded.firstWhere(
-              (record) => resolvePrimaryKeyValue(resource, record) == primaryKey,
+              (record) =>
+                  resolvePrimaryKeyValue(resource, record) == primaryKey,
             );
             detailsRecord = updatedRecord;
           } catch (_) {
@@ -187,15 +188,15 @@ class AdminDashboardController extends ChangeNotifier {
   ) async {
     await adminEndpoint.update(resource.key, payload);
     await loadRecords(resource);
-    
+
     // Update details record if it's the same record being edited
-    if (isShowingDetails && 
+    if (isShowingDetails &&
         detailsResource?.key == resource.key &&
         detailsRecord != null) {
       final primaryKey = resolvePrimaryKeyValue(resource, detailsRecord!);
       final updatedPrimaryKey = resolvePrimaryKeyValue(resource, payload);
-      if (primaryKey != null && 
-          updatedPrimaryKey != null && 
+      if (primaryKey != null &&
+          updatedPrimaryKey != null &&
           primaryKey == updatedPrimaryKey) {
         // Update the displayed record with the new values
         detailsRecord = payload;

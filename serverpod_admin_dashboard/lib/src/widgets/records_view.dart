@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:serverpod_admin_dashboard/src/helpers/admin_resources.dart';
 import 'package:serverpod_admin_dashboard/src/widgets/records_body.dart';
 
-class RecordsPane extends StatefulWidget {
-  const RecordsPane({
+/// Widget that displays a resource's records with search, add, edit, and delete functionality.
+class RecordsView extends StatefulWidget {
+  const RecordsView({
     required this.resource,
     required this.records,
     required this.isLoading,
@@ -33,10 +34,10 @@ class RecordsPane extends StatefulWidget {
   final VoidCallback? onClearSearch;
 
   @override
-  State<RecordsPane> createState() => _RecordsPaneState();
+  State<RecordsView> createState() => _RecordsViewState();
 }
 
-class _RecordsPaneState extends State<RecordsPane> {
+class _RecordsViewState extends State<RecordsView> {
   late TextEditingController _searchController;
 
   @override
@@ -46,14 +47,12 @@ class _RecordsPaneState extends State<RecordsPane> {
   }
 
   @override
-  void didUpdateWidget(RecordsPane oldWidget) {
+  void didUpdateWidget(RecordsView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Only sync controller when resource changes (clear search on resource change)
+    // Clear search when resource changes
     if (oldWidget.resource?.key != widget.resource?.key) {
       _searchController.clear();
     }
-    // Don't sync controller text on searchQuery changes - let the TextField manage its own state
-    // The searchQuery prop is just for external updates (like clearing), not for syncing during typing
   }
 
   @override
@@ -65,7 +64,7 @@ class _RecordsPaneState extends State<RecordsPane> {
   @override
   Widget build(BuildContext context) {
     if (widget.resource == null) {
-      return _buildNoResourceSelected(context);
+      return _buildEmptyState(context);
     }
 
     return Card(
@@ -75,7 +74,7 @@ class _RecordsPaneState extends State<RecordsPane> {
         children: [
           _buildHeader(context),
           const Divider(height: 1, thickness: 1),
-          _buildBody(context),
+          _buildRecordsContent(context),
         ],
       ),
     );
@@ -94,14 +93,14 @@ class _RecordsPaneState extends State<RecordsPane> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildHeaderInfo(context),
-          _buildHeaderActions(context),
+          _buildResourceInfo(context),
+          _buildActionButtons(context),
         ],
       ),
     );
   }
 
-  Widget _buildHeaderInfo(BuildContext context) {
+  Widget _buildResourceInfo(BuildContext context) {
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,12 +112,12 @@ class _RecordsPaneState extends State<RecordsPane> {
           ),
         ),
         const SizedBox(height: 6),
-        _buildRecordCountChip(context),
+        _buildRecordsCountChip(context),
       ],
     );
   }
 
-  Widget _buildRecordCountChip(BuildContext context) {
+  Widget _buildRecordsCountChip(BuildContext context) {
     final theme = Theme.of(context);
     final countText = widget.totalRecords != null &&
             widget.totalRecords != widget.records.length
@@ -134,19 +133,19 @@ class _RecordsPaneState extends State<RecordsPane> {
     );
   }
 
-  Widget _buildHeaderActions(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context) {
     return Row(
       children: [
         if (widget.onSearchChanged != null) ...[
-          _buildSearchField(context),
+          _buildSearchInput(context),
           const SizedBox(width: 12),
         ],
-        _buildAddButton(context),
+        _buildAddRecordButton(context),
       ],
     );
   }
 
-  Widget _buildSearchField(BuildContext context) {
+  Widget _buildSearchInput(BuildContext context) {
     final theme = Theme.of(context);
     final hasSearchQuery = (widget.searchQuery ?? '').isNotEmpty;
 
@@ -160,7 +159,7 @@ class _RecordsPaneState extends State<RecordsPane> {
           suffixIcon: hasSearchQuery
               ? IconButton(
                   icon: const Icon(Icons.clear, size: 20),
-                  onPressed: _handleClearSearch,
+                  onPressed: _clearSearch,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   style: IconButton.styleFrom(
@@ -200,7 +199,7 @@ class _RecordsPaneState extends State<RecordsPane> {
     );
   }
 
-  Widget _buildAddButton(BuildContext context) {
+  Widget _buildAddRecordButton(BuildContext context) {
     return FilledButton.icon(
       onPressed: widget.onAdd,
       icon: const Icon(Icons.add),
@@ -208,7 +207,7 @@ class _RecordsPaneState extends State<RecordsPane> {
     );
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildRecordsContent(BuildContext context) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -227,12 +226,12 @@ class _RecordsPaneState extends State<RecordsPane> {
     );
   }
 
-  void _handleClearSearch() {
+  void _clearSearch() {
     _searchController.clear();
     widget.onClearSearch?.call();
   }
 
-  Widget _buildNoResourceSelected(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context) {
     final theme = Theme.of(context);
     return Center(
       child: Padding(
