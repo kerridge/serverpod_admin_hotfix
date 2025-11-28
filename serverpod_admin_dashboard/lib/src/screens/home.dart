@@ -1,57 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:serverpod_admin_dashboard/src/admin_dashboard.dart';
 import 'package:serverpod_admin_dashboard/src/controller/admin_dashboard.dart';
-import 'package:serverpod_admin_dashboard/src/helpers/admin_resources.dart';
 import 'package:serverpod_admin_dashboard/src/screens/home_operations.dart';
 import 'package:serverpod_admin_dashboard/src/screens/record_details.dart';
 import 'package:serverpod_admin_dashboard/src/widgets/footer.dart';
 import 'package:serverpod_admin_dashboard/src/widgets/records_view.dart';
 import 'package:serverpod_admin_dashboard/src/widgets/side_bar.dart';
-
-/// Builder function for custom records pane/body widget
-typedef BodyBuilder = Widget Function(
-  BuildContext context,
-  AdminDashboardController controller,
-  HomeOperations operations,
-);
-
-/// Builder function for custom record details widget
-typedef DetailsBuilder = Widget Function(
-  BuildContext context,
-  AdminDashboardController controller,
-  HomeOperations operations,
-  AdminResource resource,
-  Map<String, String> record,
-);
-
-/// Builder function for custom edit/update dialog widget
-typedef EditDialogBuilder = Widget Function(
-  BuildContext context,
-  AdminDashboardController controller,
-  HomeOperations operations,
-  AdminResource resource,
-  Map<String, String> currentValues,
-  Future<bool> Function(Map<String, String> payload) onSubmit,
-);
-
-/// Builder function for custom delete confirmation dialog widget
-typedef DeleteDialogBuilder = Widget Function(
-  BuildContext context,
-  AdminDashboardController controller,
-  HomeOperations operations,
-  AdminResource resource,
-  Map<String, String> record,
-  Future<void> Function() onConfirm,
-);
-
-/// Builder function for custom create/new record dialog widget
-typedef CreateDialogBuilder = Widget Function(
-  BuildContext context,
-  AdminDashboardController controller,
-  HomeOperations operations,
-  AdminResource resource,
-  Future<bool> Function(Map<String, String> payload) onSubmit,
-);
 
 class Home extends StatefulWidget {
   const Home({
