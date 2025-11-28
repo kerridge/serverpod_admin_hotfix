@@ -116,9 +116,7 @@ class Sidebar extends StatelessWidget {
     }
 
     if (resources.isEmpty) {
-      return const Center(
-        child: Text('No resources registered.'),
-      );
+      return _buildNoResourcesState(context);
     }
 
     final theme = Theme.of(context);
@@ -174,6 +172,48 @@ class Sidebar extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildNoResourcesState(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.storage_outlined,
+                size: 48,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'No Resources',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'No resources are registered yet. Register resources in your Serverpod server to get started.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

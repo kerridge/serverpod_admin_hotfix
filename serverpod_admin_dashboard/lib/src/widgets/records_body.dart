@@ -13,6 +13,8 @@ class RecordsBody extends StatefulWidget {
     required this.onEdit,
     required this.onDelete,
     this.onView,
+    this.searchQuery,
+    this.totalRecords,
   });
 
   final AdminResource resource;
@@ -22,6 +24,8 @@ class RecordsBody extends StatefulWidget {
   final void Function(Map<String, String> record)? onEdit;
   final void Function(Map<String, String> record)? onDelete;
   final void Function(Map<String, String> record)? onView;
+  final String? searchQuery;
+  final int? totalRecords;
 
   @override
   State<RecordsBody> createState() => _RecordsBodyState();
@@ -64,21 +68,11 @@ class _RecordsBodyState extends State<RecordsBody> {
     }
 
     if (widget.errorMessage != null) {
-      return Center(
-        child: Text(
-          widget.errorMessage!,
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-      );
+      return _buildErrorState(context);
     }
 
     if (widget.records.isEmpty) {
-      return Center(
-        child: Text(
-          'No records found for ${widget.resource.tableName}.',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      );
+      return _buildEmptyState(context);
     }
 
     final columns = widget.resource.columns;
@@ -220,6 +214,133 @@ class _RecordsBodyState extends State<RecordsBody> {
             onPressed: () => widget.onDelete!(record),
           ),
       ],
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    final theme = Theme.of(context);
+    final isSearchResult = widget.searchQuery != null &&
+        widget.searchQuery!.isNotEmpty &&
+        widget.totalRecords != null &&
+        widget.totalRecords! > 0;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(48),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: isSearchResult
+                    ? theme.colorScheme.secondaryContainer.withOpacity(0.3)
+                    : theme.colorScheme.primaryContainer.withOpacity(0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isSearchResult ? Icons.search_off_rounded : Icons.inbox_outlined,
+                size: 64,
+                color: isSearchResult
+                    ? theme.colorScheme.secondary
+                    : theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              isSearchResult
+                  ? 'No matching records found'
+                  : 'No records yet',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              isSearchResult
+                  ? 'Try adjusting your search query to find what you\'re looking for.'
+                  : 'This table is empty. Create your first record to get started.',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (isSearchResult) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      size: 18,
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Searching for: "${widget.searchQuery}"',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(48),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer.withOpacity(0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.error_outline_rounded,
+                size: 64,
+                color: theme.colorScheme.error,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Unable to Load Records',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.error,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              widget.errorMessage!,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

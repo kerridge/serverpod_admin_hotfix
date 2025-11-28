@@ -65,12 +65,7 @@ class _RecordsPaneState extends State<RecordsPane> {
   @override
   Widget build(BuildContext context) {
     if (widget.resource == null) {
-      return Center(
-        child: Text(
-          'Select a resource to view its records.',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      );
+      return _buildNoResourceSelected(context);
     }
 
     final theme = Theme.of(context);
@@ -198,10 +193,54 @@ class _RecordsPaneState extends State<RecordsPane> {
                 onEdit: widget.onEdit,
                 onDelete: widget.onDelete,
                 onView: widget.onView,
+                searchQuery: widget.searchQuery,
+                totalRecords: widget.totalRecords,
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNoResourceSelected(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(48),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.table_chart_outlined,
+                size: 64,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Select a Resource',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Choose a resource from the sidebar to view and manage its records.',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
