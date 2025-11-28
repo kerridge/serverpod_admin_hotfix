@@ -98,6 +98,16 @@ typedef CreateDialogBuilder = Widget Function(
   Future<bool> Function(Map<String, String> payload) onSubmit,
 );
 
+/// Builder function for custom footer widget
+///
+/// Receives the [BuildContext] and [AdminDashboardController] to build
+/// a custom footer widget. The custom footer will be displayed above the
+/// default footer. The default footer is always shown and cannot be changed.
+typedef FooterBuilder = Widget Function(
+  BuildContext context,
+  AdminDashboardController controller,
+);
+
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({
     super.key,
@@ -113,6 +123,7 @@ class AdminDashboard extends StatefulWidget {
     this.customEditDialogBuilder,
     this.customDeleteDialogBuilder,
     this.customCreateDialogBuilder,
+    this.customFooterBuilder,
   });
 
   final ServerpodClientShared client;
@@ -143,6 +154,11 @@ class AdminDashboard extends StatefulWidget {
 
   /// Optional custom create/new record dialog builder. If provided, replaces the default create dialog.
   final CreateDialogBuilder? customCreateDialogBuilder;
+
+  /// Optional custom footer builder. If provided, the custom footer will be
+  /// displayed above the default footer. The default footer is always shown
+  /// and cannot be changed.
+  final FooterBuilder? customFooterBuilder;
 
   @override
   State<AdminDashboard> createState() => _AdminDashboardState();
@@ -253,6 +269,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             customEditDialogBuilder: widget.customEditDialogBuilder,
             customDeleteDialogBuilder: widget.customDeleteDialogBuilder,
             customCreateDialogBuilder: widget.customCreateDialogBuilder,
+            customFooterBuilder: widget.customFooterBuilder,
           ),
         );
       },

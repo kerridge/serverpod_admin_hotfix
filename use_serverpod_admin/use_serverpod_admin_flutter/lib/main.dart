@@ -8,6 +8,7 @@ import 'custom_details.dart';
 import 'custom_edit_dialog.dart';
 import 'custom_delete_dialog.dart';
 import 'custom_create_dialog.dart';
+import 'custom_footer.dart';
 
 /// Sets up a global client object that can be used to talk to the server from
 /// anywhere in our app. The client is generated from your server code
@@ -88,6 +89,9 @@ void main() {
             label: 'Posts',
             icon: Icons.post_add,
           ),
+        },
+        customFooterBuilder: (context, controller) {
+          return CustomFooter(controller: controller);
         },
       ),
     ),

@@ -64,6 +64,7 @@ class Home extends StatefulWidget {
     this.customEditDialogBuilder,
     this.customDeleteDialogBuilder,
     this.customCreateDialogBuilder,
+    this.customFooterBuilder,
   });
 
   final AdminDashboardController controller;
@@ -74,6 +75,7 @@ class Home extends StatefulWidget {
   final EditDialogBuilder? customEditDialogBuilder;
   final DeleteDialogBuilder? customDeleteDialogBuilder;
   final CreateDialogBuilder? customCreateDialogBuilder;
+  final FooterBuilder? customFooterBuilder;
 
   @override
   State<Home> createState() => _HomeState();
@@ -206,6 +208,22 @@ class _HomeState extends State<Home> {
     return _buildRecordsPane();
   }
 
+  /// Builds the footer widget
+  Widget _buildFooter() {
+    // Always show default footer, and custom footer on top if provided
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (widget.customFooterBuilder != null) ...[
+          widget.customFooterBuilder!(context, widget.controller),
+          const SizedBox(height: 12),
+        ],
+        // Default footer (always shown, unchanged)
+        const Footer(),
+      ],
+    );
+  }
+
   /// Builds the sidebar widget
   Widget _buildSidebar() {
     // Use custom builder if provided
@@ -331,7 +349,7 @@ class _HomeState extends State<Home> {
                                 ),
                         ),
                         const SizedBox(height: 16),
-                        const Footer(),
+                        _buildFooter(),
                       ],
                     ),
                   ),
