@@ -70,6 +70,19 @@ typedef DeleteDialogBuilder = Widget Function(
   Future<void> Function() onConfirm,
 );
 
+/// Builder function for custom create/new record dialog widget
+///
+/// Receives the [BuildContext], [AdminDashboardController], [HomeOperations],
+/// and the [AdminResource].
+/// Should return a dialog that calls [onSubmit] with the new record payload when saved.
+typedef CreateDialogBuilder = Widget Function(
+  BuildContext context,
+  AdminDashboardController controller,
+  HomeOperations operations,
+  AdminResource resource,
+  Future<bool> Function(Map<String, String> payload) onSubmit,
+);
+
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({
     super.key,
@@ -83,6 +96,7 @@ class AdminDashboard extends StatefulWidget {
     this.customDetailsBuilder,
     this.customEditDialogBuilder,
     this.customDeleteDialogBuilder,
+    this.customCreateDialogBuilder,
   });
 
   final ServerpodClientShared client;
@@ -105,6 +119,9 @@ class AdminDashboard extends StatefulWidget {
 
   /// Optional custom delete confirmation dialog builder. If provided, replaces the default delete dialog.
   final DeleteDialogBuilder? customDeleteDialogBuilder;
+
+  /// Optional custom create/new record dialog builder. If provided, replaces the default create dialog.
+  final CreateDialogBuilder? customCreateDialogBuilder;
 
   @override
   State<AdminDashboard> createState() => _AdminDashboardState();
@@ -213,6 +230,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             customDetailsBuilder: widget.customDetailsBuilder,
             customEditDialogBuilder: widget.customEditDialogBuilder,
             customDeleteDialogBuilder: widget.customDeleteDialogBuilder,
+            customCreateDialogBuilder: widget.customCreateDialogBuilder,
           ),
         );
       },

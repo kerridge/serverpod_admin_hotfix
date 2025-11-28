@@ -49,6 +49,15 @@ typedef DeleteDialogBuilder = Widget Function(
   Future<void> Function() onConfirm,
 );
 
+/// Builder function for custom create/new record dialog widget
+typedef CreateDialogBuilder = Widget Function(
+  BuildContext context,
+  AdminDashboardController controller,
+  HomeOperations operations,
+  AdminResource resource,
+  Future<bool> Function(Map<String, String> payload) onSubmit,
+);
+
 class Home extends StatefulWidget {
   const Home({
     super.key,
@@ -58,6 +67,7 @@ class Home extends StatefulWidget {
     this.customDetailsBuilder,
     this.customEditDialogBuilder,
     this.customDeleteDialogBuilder,
+    this.customCreateDialogBuilder,
   });
 
   final AdminDashboardController controller;
@@ -66,6 +76,7 @@ class Home extends StatefulWidget {
   final DetailsBuilder? customDetailsBuilder;
   final EditDialogBuilder? customEditDialogBuilder;
   final DeleteDialogBuilder? customDeleteDialogBuilder;
+  final CreateDialogBuilder? customCreateDialogBuilder;
 
   @override
   State<Home> createState() => _HomeState();
@@ -106,6 +117,7 @@ class _HomeState extends State<Home> {
       context: context,
       customEditDialogBuilder: widget.customEditDialogBuilder,
       customDeleteDialogBuilder: widget.customDeleteDialogBuilder,
+      customCreateDialogBuilder: widget.customCreateDialogBuilder,
     );
   }
 
@@ -116,6 +128,7 @@ class _HomeState extends State<Home> {
       context: context,
       customEditDialogBuilder: widget.customEditDialogBuilder,
       customDeleteDialogBuilder: widget.customDeleteDialogBuilder,
+      customCreateDialogBuilder: widget.customCreateDialogBuilder,
     );
   }
 

@@ -12,25 +12,45 @@ class HomeOperations {
     required this.context,
     this.customEditDialogBuilder,
     this.customDeleteDialogBuilder,
+    this.customCreateDialogBuilder,
   });
 
   final AdminDashboardController controller;
   final BuildContext context;
   final EditDialogBuilder? customEditDialogBuilder;
   final DeleteDialogBuilder? customDeleteDialogBuilder;
+  final CreateDialogBuilder? customCreateDialogBuilder;
 
   /// Shows the create record dialog.
   Future<void> showCreateDialog(AdminResource resource) async {
-    final created = await showDialog<bool>(
-      context: context,
-      builder: (context) => RecordDialog(
-        resource: resource,
-        onSubmit: (payload) => _createRecord(resource, payload),
-      ),
-    );
+    if (customCreateDialogBuilder != null) {
+      final created = await showDialog<bool>(
+        context: context,
+        builder: (context) => customCreateDialogBuilder!(
+          context,
+          controller,
+          this,
+          resource,
+          (payload) => _createRecord(resource, payload),
+        ),
+      );
 
-    if (created == true) {
-      // Records are reloaded in _createRecord
+      if (created == true) {
+        // Records are reloaded in _createRecord
+      }
+    } else {
+      // Default implementation
+      final created = await showDialog<bool>(
+        context: context,
+        builder: (context) => RecordDialog(
+          resource: resource,
+          onSubmit: (payload) => _createRecord(resource, payload),
+        ),
+      );
+
+      if (created == true) {
+        // Records are reloaded in _createRecord
+      }
     }
   }
 
