@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## 0.1.3
+## 0.1.4
 
 - Initial version
 - Reusable Serverpod admin dashboard widget
