@@ -12,23 +12,23 @@ You've built an amazing Serverpod app with powerful endpoints, robust models, an
 
 Browse and manage all your data with a beautiful, intuitive interface.
 
-![Admin Dashboard](images/posts.png)
+![Admin Dashboard](https://raw.githubusercontent.com/AdamMusa/serverpod_admin/main/images/posts.png)
 
 Powerful search and filtering capabilities to find exactly what you need.
 
-![Search & Filter](images/search.png)
+![Search & Filter](https://raw.githubusercontent.com/AdamMusa/serverpod_admin/main/images/search.png)
 
 Edit records with a clean, user-friendly interface.
 
-![Edit Records](images/edit.png)
+![Edit Records](https://raw.githubusercontent.com/AdamMusa/serverpod_admin/main/images/edit.png)
 
 View detailed information about any record.
 
-![Record Details](images/detail.png)
+![Record Details](https://raw.githubusercontent.com/AdamMusa/serverpod_admin/main/images/detail.png)
 
 Beautiful empty states when no records are found.
 
-![Empty State](images/empty_record.png)
+![Empty State](https://raw.githubusercontent.com/AdamMusa/serverpod_admin/main/images/empty_record.png)
 
 ---
 
