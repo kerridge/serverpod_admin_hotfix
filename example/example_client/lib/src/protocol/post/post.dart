@@ -22,7 +22,8 @@ abstract class Post implements _i1.SerializableModel {
     this.comments,
     required this.description,
     required this.date,
-  });
+    bool? isPublished,
+  }) : isPublished = isPublished ?? false;
 
   factory Post({
     int? id,
@@ -30,6 +31,7 @@ abstract class Post implements _i1.SerializableModel {
     List<_i2.Comment>? comments,
     required String description,
     required DateTime date,
+    bool? isPublished,
   }) = _PostImpl;
 
   factory Post.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -43,6 +45,7 @@ abstract class Post implements _i1.SerializableModel {
             ),
       description: jsonSerialization['description'] as String,
       date: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['date']),
+      isPublished: jsonSerialization['isPublished'] as bool,
     );
   }
 
@@ -63,6 +66,9 @@ abstract class Post implements _i1.SerializableModel {
   /// The date the  was created
   DateTime date;
 
+  /// If the post is published
+  bool isPublished;
+
   /// Returns a shallow copy of this [Post]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -72,6 +78,7 @@ abstract class Post implements _i1.SerializableModel {
     List<_i2.Comment>? comments,
     String? description,
     DateTime? date,
+    bool? isPublished,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -83,6 +90,7 @@ abstract class Post implements _i1.SerializableModel {
         'comments': comments?.toJson(valueToJson: (v) => v.toJson()),
       'description': description,
       'date': date.toJson(),
+      'isPublished': isPublished,
     };
   }
 
@@ -101,12 +109,14 @@ class _PostImpl extends Post {
     List<_i2.Comment>? comments,
     required String description,
     required DateTime date,
+    bool? isPublished,
   }) : super._(
          id: id,
          title: title,
          comments: comments,
          description: description,
          date: date,
+         isPublished: isPublished,
        );
 
   /// Returns a shallow copy of this [Post]
@@ -119,6 +129,7 @@ class _PostImpl extends Post {
     Object? comments = _Undefined,
     String? description,
     DateTime? date,
+    bool? isPublished,
   }) {
     return Post(
       id: id is int? ? id : this.id,
@@ -128,6 +139,7 @@ class _PostImpl extends Post {
           : this.comments?.map((e0) => e0.copyWith()).toList(),
       description: description ?? this.description,
       date: date ?? this.date,
+      isPublished: isPublished ?? this.isPublished,
     );
   }
 }

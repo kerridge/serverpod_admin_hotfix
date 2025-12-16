@@ -24,7 +24,8 @@ abstract class Post implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     this.comments,
     required this.description,
     required this.date,
-  });
+    bool? isPublished,
+  }) : isPublished = isPublished ?? false;
 
   factory Post({
     int? id,
@@ -32,6 +33,7 @@ abstract class Post implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     List<_i2.Comment>? comments,
     required String description,
     required DateTime date,
+    bool? isPublished,
   }) = _PostImpl;
 
   factory Post.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -45,6 +47,7 @@ abstract class Post implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
             ),
       description: jsonSerialization['description'] as String,
       date: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['date']),
+      isPublished: jsonSerialization['isPublished'] as bool,
     );
   }
 
@@ -67,6 +70,9 @@ abstract class Post implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   /// The date the  was created
   DateTime date;
 
+  /// If the post is published
+  bool isPublished;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -79,6 +85,7 @@ abstract class Post implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     List<_i2.Comment>? comments,
     String? description,
     DateTime? date,
+    bool? isPublished,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -90,6 +97,7 @@ abstract class Post implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
         'comments': comments?.toJson(valueToJson: (v) => v.toJson()),
       'description': description,
       'date': date.toJson(),
+      'isPublished': isPublished,
     };
   }
 
@@ -103,6 +111,7 @@ abstract class Post implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
         'comments': comments?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
       'description': description,
       'date': date.toJson(),
+      'isPublished': isPublished,
     };
   }
 
@@ -145,12 +154,14 @@ class _PostImpl extends Post {
     List<_i2.Comment>? comments,
     required String description,
     required DateTime date,
+    bool? isPublished,
   }) : super._(
          id: id,
          title: title,
          comments: comments,
          description: description,
          date: date,
+         isPublished: isPublished,
        );
 
   /// Returns a shallow copy of this [Post]
@@ -163,6 +174,7 @@ class _PostImpl extends Post {
     Object? comments = _Undefined,
     String? description,
     DateTime? date,
+    bool? isPublished,
   }) {
     return Post(
       id: id is int? ? id : this.id,
@@ -172,6 +184,7 @@ class _PostImpl extends Post {
           : this.comments?.map((e0) => e0.copyWith()).toList(),
       description: description ?? this.description,
       date: date ?? this.date,
+      isPublished: isPublished ?? this.isPublished,
     );
   }
 }
@@ -193,6 +206,11 @@ class PostUpdateTable extends _i1.UpdateTable<PostTable> {
     table.date,
     value,
   );
+
+  _i1.ColumnValue<bool, bool> isPublished(bool value) => _i1.ColumnValue(
+    table.isPublished,
+    value,
+  );
 }
 
 class PostTable extends _i1.Table<int?> {
@@ -209,6 +227,11 @@ class PostTable extends _i1.Table<int?> {
     date = _i1.ColumnDateTime(
       'date',
       this,
+    );
+    isPublished = _i1.ColumnBool(
+      'isPublished',
+      this,
+      hasDefault: true,
     );
   }
 
@@ -228,6 +251,9 @@ class PostTable extends _i1.Table<int?> {
 
   /// The date the  was created
   late final _i1.ColumnDateTime date;
+
+  /// If the post is published
+  late final _i1.ColumnBool isPublished;
 
   _i2.CommentTable get __comments {
     if (___comments != null) return ___comments!;
@@ -267,6 +293,7 @@ class PostTable extends _i1.Table<int?> {
     title,
     description,
     date,
+    isPublished,
   ];
 
   @override

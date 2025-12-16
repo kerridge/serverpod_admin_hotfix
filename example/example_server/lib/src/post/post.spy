@@ -10,4 +10,5 @@ fields:
   description: String
   ### The date the  was created
   date: DateTime
-  ### The ingredients the user has passed in
+  ### If the post is published
+  isPublished: bool, default=false

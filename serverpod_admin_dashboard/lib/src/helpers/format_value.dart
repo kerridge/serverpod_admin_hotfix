@@ -11,3 +11,14 @@ String formatRecordValue(AdminColumn column, String? value) {
   }
   return value;
 }
+
+bool isBooleanType(AdminColumn column) {
+  final dataType = column.dataType.toLowerCase();
+  return dataType.contains('bool');
+}
+
+bool parseBooleanValue(String? value) {
+  if (value == null || value.isEmpty) return false;
+  final lower = value.toLowerCase().trim();
+  return lower == 'true' || lower == '1' || lower == 'yes';
+}
