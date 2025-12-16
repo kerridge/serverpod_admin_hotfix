@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:serverpod_admin_dashboard/src/controller/admin_dashboard.dart';
 import 'package:serverpod_admin_dashboard/src/helpers/admin_resources.dart';
+import 'package:serverpod_admin_dashboard/src/helpers/foreign_key_helper.dart';
+import 'package:serverpod_admin_dashboard/src/widgets/foreign_key_dropdown.dart';
 
 /// Default edit dialog with modern design
 class DefaultEditDialog extends StatefulWidget {
@@ -7,12 +10,14 @@ class DefaultEditDialog extends StatefulWidget {
     required this.resource,
     required this.currentValues,
     required this.onSubmit,
+    required this.controller,
     super.key,
   });
 
   final AdminResource resource;
   final Map<String, String> currentValues;
   final Future<bool> Function(Map<String, String> payload) onSubmit;
+  final AdminDashboardController controller;
 
   @override
   State<DefaultEditDialog> createState() => _DefaultEditDialogState();
@@ -22,6 +27,8 @@ class _DefaultEditDialogState extends State<DefaultEditDialog> {
   final _formKey = GlobalKey<FormState>();
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, String> _isoValues = {}; // Store ISO8601 values separately
+  final Map<String, String?> _foreignKeyValues = {}; // Store selected foreign key values
+  final Map<String, List<Map<String, String>>> _foreignKeyOptions = {}; // Cache foreign key options
   bool _isSubmitting = false;
   String? _errorMessage;
 
@@ -105,8 +112,13 @@ class _DefaultEditDialogState extends State<DefaultEditDialog> {
     for (final column in widget.resource.columns) {
       if (column.isPrimary) continue;
       final initialValue = widget.currentValues[column.name] ?? '';
-      // Store ISO8601 value and format for display
-      if (_isDateType(column) && initialValue.isNotEmpty) {
+      
+      if (column.foreignKeyTable != null) {
+        // Foreign key field - store the value and load options
+        _foreignKeyValues[column.name] = initialValue.isEmpty ? null : initialValue;
+        _loadForeignKeyOptions(column);
+      } else if (_isDateType(column) && initialValue.isNotEmpty) {
+        // Store ISO8601 value and format for display
         _isoValues[column.name] = initialValue;
         _controllers[column.name] = TextEditingController(
           text: _formatDateValue(initialValue, column),
@@ -114,6 +126,34 @@ class _DefaultEditDialogState extends State<DefaultEditDialog> {
       } else {
         _isoValues[column.name] = initialValue;
         _controllers[column.name] = TextEditingController(text: initialValue);
+      }
+    }
+  }
+
+  Future<void> _loadForeignKeyOptions(AdminColumn column) async {
+    if (column.foreignKeyTable == null) return;
+
+    final relatedResource = ForeignKeyHelper.findRelatedResource(
+      widget.controller,
+      column,
+    );
+
+    if (relatedResource == null) return;
+
+    try {
+      await widget.controller.loadRecords(relatedResource);
+
+      if (mounted) {
+        setState(() {
+          _foreignKeyOptions[column.name] = widget.controller.records;
+        });
+      }
+    } catch (_) {
+      // Failed to load foreign key options, will show empty dropdown
+      if (mounted) {
+        setState(() {
+          _foreignKeyOptions[column.name] = [];
+        });
       }
     }
   }
@@ -126,6 +166,42 @@ class _DefaultEditDialogState extends State<DefaultEditDialog> {
     super.dispose();
   }
 
+  Map<String, String> _buildPayload() {
+    final payload = <String, String>{};
+    
+    // Include primary key for updates
+    final primaryColumn = widget.resource.columns.firstWhere(
+      (col) => col.isPrimary,
+      orElse: () => widget.resource.columns.first,
+    );
+    final primaryKeyValue = widget.currentValues[primaryColumn.name];
+    if (primaryKeyValue != null && primaryKeyValue.isNotEmpty) {
+      payload[primaryColumn.name] = primaryKeyValue;
+    }
+
+    // Add all form field values
+    for (final column in widget.resource.columns) {
+      if (column.isPrimary) continue;
+      
+      if (column.foreignKeyTable != null) {
+        // Use the selected foreign key value
+        final selectedValue = _foreignKeyValues[column.name];
+        if (selectedValue != null && selectedValue.isNotEmpty) {
+          payload[column.name] = selectedValue;
+        }
+      } else if (_controllers.containsKey(column.name)) {
+        final entry = _controllers[column.name]!;
+        if (_isDateType(column)) {
+          payload[column.name] = _isoValues[column.name] ?? '';
+        } else {
+          payload[column.name] = entry.text.trim();
+        }
+      }
+    }
+    
+    return payload;
+  }
+
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -134,28 +210,7 @@ class _DefaultEditDialogState extends State<DefaultEditDialog> {
       _errorMessage = null;
     });
 
-    final payload = <String, String>{};
-    final primaryColumn = widget.resource.columns.firstWhere(
-      (col) => col.isPrimary,
-      orElse: () => widget.resource.columns.first,
-    );
-    payload[primaryColumn.name] =
-        widget.currentValues[primaryColumn.name] ?? '';
-
-    for (final entry in _controllers.entries) {
-      final column = widget.resource.columns.firstWhere(
-        (col) => col.name == entry.key,
-      );
-
-      if (_isDateType(column)) {
-        // Use ISO8601 value for date fields
-        final isoValue = _isoValues[entry.key];
-        payload[entry.key] = isoValue ?? '';
-      } else {
-        // Use text value for other fields
-        payload[entry.key] = entry.value.text.trim();
-      }
-    }
+    final payload = _buildPayload();
 
     final success = await widget.onSubmit(payload);
     if (!mounted) return;
@@ -175,8 +230,9 @@ class _DefaultEditDialogState extends State<DefaultEditDialog> {
     final theme = Theme.of(context);
 
     return Dialog(
+      backgroundColor: theme.scaffoldBackgroundColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
@@ -185,58 +241,41 @@ class _DefaultEditDialogState extends State<DefaultEditDialog> {
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(24),
+                  top: Radius.circular(12),
                 ),
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary.withOpacity(0.1),
-                    theme.colorScheme.primary.withOpacity(0.05),
-                  ],
+                border: Border(
+                  bottom: BorderSide(
+                    color: theme.dividerColor.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
               ),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.edit_note,
-                      color: theme.colorScheme.primary,
-                      size: 28,
-                    ),
+                  Icon(
+                    Icons.edit_outlined,
+                    color: theme.colorScheme.primary,
+                    size: 24,
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Edit ${widget.resource.tableName}',
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Update the fields below',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      'Edit ${widget.resource.tableName}',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   IconButton(
                     onPressed: _isSubmitting
                         ? null
                         : () => Navigator.of(context).pop(false),
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.close, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
               ),
@@ -253,6 +292,29 @@ class _DefaultEditDialogState extends State<DefaultEditDialog> {
                           .where((col) => !col.isPrimary)
                           .map((column) {
                         final isDate = _isDateType(column);
+                        final isForeignKey = column.foreignKeyTable != null;
+                        
+                        // Foreign key dropdown
+                        if (isForeignKey) {
+                          final options = _foreignKeyOptions[column.name] ?? [];
+                          
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: ForeignKeyDropdown(
+                              column: column,
+                              controller: widget.controller,
+                              options: options,
+                              value: _foreignKeyValues[column.name],
+                              onChanged: (value) {
+                                setState(() {
+                                  _foreignKeyValues[column.name] = value;
+                                });
+                              },
+                            ),
+                          );
+                        }
+                        
+                        // Regular text field
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: TextFormField(
@@ -308,15 +370,13 @@ class _DefaultEditDialogState extends State<DefaultEditDialog> {
                                         }
                                       },
                                     )
-                                  : column.hasDefault
-                                      ? Icon(
-                                          Icons.settings,
-                                          size: 18,
-                                          color: theme.colorScheme.secondary,
-                                        )
-                                      : null,
+                                  : null,
                             ),
                             validator: (value) {
+                              if (isForeignKey) {
+                                // Foreign key validation is handled in dropdown
+                                return null;
+                              }
                               if (value == null || value.trim().isEmpty) {
                                 return 'This field is required';
                               }
@@ -373,7 +433,8 @@ class _DefaultEditDialogState extends State<DefaultEditDialog> {
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.2),
+                    color: theme.dividerColor.withOpacity(0.1),
+                    width: 1,
                   ),
                 ),
               ),

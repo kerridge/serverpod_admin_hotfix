@@ -57,8 +57,9 @@ class _DefaultDeleteDialogState extends State<DefaultDeleteDialog> {
     final theme = Theme.of(context);
 
     return Dialog(
+      backgroundColor: theme.scaffoldBackgroundColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 500),

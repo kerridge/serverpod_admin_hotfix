@@ -67,8 +67,16 @@ class _RecordsViewState extends State<RecordsView> {
       return _buildEmptyState(context);
     }
 
-    return Card(
-      margin: EdgeInsets.zero,
+    final theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.dividerColor.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -86,9 +94,14 @@ class _RecordsViewState extends State<RecordsView> {
       padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(18),
+          top: Radius.circular(12),
         ),
-        color: theme.colorScheme.primary.withOpacity(0.06),
+        border: Border(
+          bottom: BorderSide(
+            color: theme.dividerColor.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,7 +200,7 @@ class _RecordsViewState extends State<RecordsView> {
             ),
           ),
           filled: true,
-          fillColor: theme.colorScheme.surface,
+          fillColor: theme.scaffoldBackgroundColor,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,
             vertical: 10,

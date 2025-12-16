@@ -4,6 +4,7 @@ fields:
   dataType: String
   hasDefault: bool
   isPrimary: bool
+  foreignKeyTable: String?
 
 
 

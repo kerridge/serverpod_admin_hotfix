@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -39,68 +40,63 @@ class EndpointAdmin extends _i1.EndpointRef {
     String resourceKey,
     int offset,
     int limit,
-  ) =>
-      caller.callServerEndpoint<List<Map<String, String>>>(
-        'serverpod_admin.admin',
-        'listPage',
-        {
-          'resourceKey': resourceKey,
-          'offset': offset,
-          'limit': limit,
-        },
-      );
+  ) => caller.callServerEndpoint<List<Map<String, String>>>(
+    'serverpod_admin.admin',
+    'listPage',
+    {
+      'resourceKey': resourceKey,
+      'offset': offset,
+      'limit': limit,
+    },
+  );
 
   _i2.Future<Map<String, dynamic>?> find(
     String resourceKey,
     Object id,
-  ) =>
-      caller.callServerEndpoint<Map<String, dynamic>?>(
-        'serverpod_admin.admin',
-        'find',
-        {
-          'resourceKey': resourceKey,
-          'id': id,
-        },
-      );
+  ) => caller.callServerEndpoint<Map<String, dynamic>?>(
+    'serverpod_admin.admin',
+    'find',
+    {
+      'resourceKey': resourceKey,
+      'id': id,
+    },
+  );
 
   _i2.Future<Map<String, String>> create(
     String resourceKey,
     Map<String, String> data,
-  ) =>
-      caller.callServerEndpoint<Map<String, String>>(
-        'serverpod_admin.admin',
-        'create',
-        {
-          'resourceKey': resourceKey,
-          'data': data,
-        },
-      );
+  ) => caller.callServerEndpoint<Map<String, String>>(
+    'serverpod_admin.admin',
+    'create',
+    {
+      'resourceKey': resourceKey,
+      'data': data,
+    },
+  );
 
   _i2.Future<Map<String, String>> update(
     String resourceKey,
     Map<String, String> data,
-  ) =>
-      caller.callServerEndpoint<Map<String, String>>(
-        'serverpod_admin.admin',
-        'update',
-        {
-          'resourceKey': resourceKey,
-          'data': data,
-        },
-      );
+  ) => caller.callServerEndpoint<Map<String, String>>(
+    'serverpod_admin.admin',
+    'update',
+    {
+      'resourceKey': resourceKey,
+      'data': data,
+    },
+  );
 
   _i2.Future<bool> delete(
     String resourceKey,
     String id,
-  ) =>
-      caller.callServerEndpoint<bool>(
-        'serverpod_admin.admin',
-        'delete',
-        {
-          'resourceKey': resourceKey,
-          'id': id,
-        },
-      );
+  ) => caller.callServerEndpoint<bool>(
+    'serverpod_admin.admin',
+    'delete',
+    {
+      'resourceKey': resourceKey,
+      'id': id,
+    },
+  );
 }
 
 class Caller extends _i1.ModuleEndpointCaller {
@@ -111,6 +107,7 @@ class Caller extends _i1.ModuleEndpointCaller {
   late final EndpointAdmin admin;
 
   @override
-  Map<String, _i1.EndpointRef> get endpointRefLookup =>
-      {'serverpod_admin.admin': admin};
+  Map<String, _i1.EndpointRef> get endpointRefLookup => {
+    'serverpod_admin.admin': admin,
+  };
 }

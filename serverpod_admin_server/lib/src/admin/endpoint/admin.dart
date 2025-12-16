@@ -6,6 +6,8 @@ import '../admin_registry.dart';
 import '../../../serverpod_admin_server.dart' show AdminResource;
 
 class AdminEndpoint extends Endpoint {
+  static const String _classNameKey = '__className__';
+
   final AdminRegistry _registry = AdminRegistry();
 
   AdminEntryBase _resolve(String resourceKey) {
@@ -68,7 +70,9 @@ class AdminEndpoint extends Endpoint {
     Object id,
   ) async {
     final entry = _resolve(resourceKey);
-    return entry.find(session, id);
+    final result = await entry.find(session, id);
+    if (result == null) return null;
+    return _removeClassName(result);
   }
 
   Future<Map<String, String>> create(
@@ -168,12 +172,21 @@ class AdminEndpoint extends Endpoint {
   ) =>
       rows.map(_stringifyRecord).toList();
 
-  Map<String, String> _stringifyRecord(Map<String, dynamic> row) => row.map(
-        (key, value) => MapEntry(
-          key,
-          _stringifyValue(value),
-        ),
-      );
+  Map<String, String> _stringifyRecord(Map<String, dynamic> row) {
+    return Map.fromEntries(
+      row.entries
+          .where((entry) => entry.key != _classNameKey)
+          .map((entry) => MapEntry(entry.key, _stringifyValue(entry.value))),
+    );
+  }
+
+  /// Removes __className__ from a dynamic map to prevent client-side
+  /// deserialization issues.
+  Map<String, dynamic> _removeClassName(Map<String, dynamic> map) {
+    final cleaned = Map<String, dynamic>.from(map);
+    cleaned.remove(_classNameKey);
+    return cleaned;
+  }
 
   String _stringifyValue(dynamic value) {
     if (value == null) return '';

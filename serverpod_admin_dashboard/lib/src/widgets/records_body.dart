@@ -104,7 +104,7 @@ class _RecordsBodyState extends State<RecordsBody> {
                         ),
                         headingRowColor: WidgetStateProperty.resolveWith(
                           (states) =>
-                              theme.colorScheme.secondary.withOpacity(0.08),
+                              theme.dividerColor.withOpacity(0.05),
                         ),
                         dataTextStyle: theme.textTheme.bodyMedium,
                         dividerThickness: 0.6,

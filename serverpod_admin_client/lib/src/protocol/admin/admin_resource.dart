@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../admin/admin_column.dart' as _i2;
+import 'package:serverpod_admin_client/src/protocol/protocol.dart' as _i3;
 
 abstract class AdminResource implements _i1.SerializableModel {
   AdminResource._({
@@ -29,9 +31,9 @@ abstract class AdminResource implements _i1.SerializableModel {
     return AdminResource(
       key: jsonSerialization['key'] as String,
       tableName: jsonSerialization['tableName'] as String,
-      columns: (jsonSerialization['columns'] as List)
-          .map((e) => _i2.AdminColumn.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      columns: _i3.Protocol().deserialize<List<_i2.AdminColumn>>(
+        jsonSerialization['columns'],
+      ),
     );
   }
 
@@ -52,6 +54,7 @@ abstract class AdminResource implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod_admin.AdminResource',
       'key': key,
       'tableName': tableName,
       'columns': columns.toJson(valueToJson: (v) => v.toJson()),
@@ -70,10 +73,10 @@ class _AdminResourceImpl extends AdminResource {
     required String tableName,
     required List<_i2.AdminColumn> columns,
   }) : super._(
-          key: key,
-          tableName: tableName,
-          columns: columns,
-        );
+         key: key,
+         tableName: tableName,
+         columns: columns,
+       );
 
   /// Returns a shallow copy of this [AdminResource]
   /// with some or all fields replaced by the given arguments.

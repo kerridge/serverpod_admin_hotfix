@@ -31,75 +31,61 @@ class Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return SizedBox(
+    return Container(
       width: 280,
-      child: Card(
-        margin: EdgeInsets.zero,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.dashboard_customize_outlined,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Resources',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Text(
-                          '${resources.length} available',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.textTheme.bodySmall?.color
-                                ?.withOpacity(0.65),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: isInDrawer
-                        ? 'Close drawer'
-                        : (isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'),
-                    icon: Icon(
-                      isInDrawer
-                          ? Icons.close_rounded
-                          : (isCollapsed
-                              ? Icons.chevron_right_rounded
-                              : Icons.chevron_left_rounded),
-                    ),
-                    onPressed: onToggleCollapse,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: _buildContent(context),
+      color: theme.scaffoldBackgroundColor,
+      child: Column(
+        children: [
+          // Simple header
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.dividerColor.withOpacity(0.1),
+                  width: 1,
                 ),
               ),
-            ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Resources',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                if (!isInDrawer)
+                  IconButton(
+                    icon: Icon(
+                      isCollapsed
+                          ? Icons.chevron_right_rounded
+                          : Icons.chevron_left_rounded,
+                      size: 20,
+                    ),
+                    onPressed: onToggleCollapse,
+                    tooltip: isCollapsed ? 'Expand sidebar' : 'Collapse sidebar',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                if (isInDrawer)
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 20),
+                    onPressed: onToggleCollapse,
+                    tooltip: 'Close drawer',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+              ],
+            ),
           ),
-        ),
+          // Content
+          Expanded(
+            child: _buildContent(context),
+          ),
+        ],
       ),
     );
   }
@@ -123,61 +109,56 @@ class Sidebar extends StatelessWidget {
     }
 
     final theme = Theme.of(context);
-    return ListView.separated(
+    return ListView.builder(
       itemCount: resources.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      padding: EdgeInsets.zero,
       itemBuilder: (context, index) {
         final resource = resources[index];
         final isSelected = selectedResource?.key == resource.key;
         final customization = itemCustomizations?[resource.key];
 
-        // Debug: Print available resource keys (remove in production)
-        // Uncomment the line below to see what keys are available:
-        // debugPrint('Resource key: ${resource.key}, tableName: ${resource.tableName}');
-
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.fastOutSlowIn,
-          decoration: BoxDecoration(
-            color: isSelected
-                ? theme.colorScheme.primary.withOpacity(0.12)
-                : theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
+        return InkWell(
+          onTap: () => onSelect(resource),
+          child: Container(
+            decoration: BoxDecoration(
               color: isSelected
-                  ? theme.colorScheme.primary
-                  : theme.dividerColor.withOpacity(0.2),
-            ),
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 6,
-            ),
-            leading: CircleAvatar(
-              radius: 18,
-              backgroundColor:
-                  theme.colorScheme.primary.withOpacity(isSelected ? 0.2 : 0.1),
-              child: Icon(
-                customization?.icon ?? Icons.data_object_outlined,
-                color: theme.colorScheme.primary,
+                  ? theme.colorScheme.primary.withOpacity(0.08)
+                  : Colors.transparent,
+              border: Border(
+                left: BorderSide(
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : Colors.transparent,
+                  width: 3,
+                ),
               ),
             ),
-            title: Text(
-              customization?.label ?? resource.tableName,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    customization?.icon ?? Icons.table_chart_outlined,
+                    size: 20,
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.iconTheme.color?.withOpacity(0.6),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      customization?.label ?? resource.tableName,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                        color: isSelected
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            trailing: Icon(
-              isSelected
-                  ? Icons.check_circle_rounded
-                  : Icons.chevron_right_rounded,
-              color: isSelected
-                  ? theme.colorScheme.primary
-                  : theme.iconTheme.color?.withOpacity(0.4),
-            ),
-            onTap: () => onSelect(resource),
           ),
         );
       },
@@ -192,31 +173,24 @@ class Sidebar extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.3),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.storage_outlined,
-                size: 48,
-                color: theme.colorScheme.primary,
-              ),
+            Icon(
+              Icons.inbox_outlined,
+              size: 48,
+              color: theme.iconTheme.color?.withOpacity(0.3),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             Text(
               'No Resources',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'No resources are registered yet. Register resources in your Serverpod server to get started.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+              'Register resources in your Serverpod server',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.5),
               ),
               textAlign: TextAlign.center,
             ),
@@ -226,3 +200,4 @@ class Sidebar extends StatelessWidget {
     );
   }
 }
+

@@ -46,6 +46,7 @@ class HomeOperations {
         context: context,
         builder: (context) => DefaultCreateDialog(
           resource: resource,
+          controller: controller,
           onSubmit: (payload) => _createRecord(resource, payload),
         ),
       );
@@ -83,6 +84,7 @@ class HomeOperations {
         context: context,
         builder: (context) => DefaultEditDialog(
           resource: resource,
+          controller: controller,
           currentValues: record,
           onSubmit: (payload) => _updateRecord(resource, payload),
         ),

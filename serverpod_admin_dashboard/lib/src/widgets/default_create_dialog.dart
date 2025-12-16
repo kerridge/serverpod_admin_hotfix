@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:serverpod_admin_dashboard/src/controller/admin_dashboard.dart';
 import 'package:serverpod_admin_dashboard/src/helpers/admin_resources.dart';
+import 'package:serverpod_admin_dashboard/src/helpers/foreign_key_helper.dart';
+import 'package:serverpod_admin_dashboard/src/widgets/foreign_key_dropdown.dart';
 
 /// Default create dialog with modern design
 class DefaultCreateDialog extends StatefulWidget {
   const DefaultCreateDialog({
     required this.resource,
     required this.onSubmit,
+    required this.controller,
     super.key,
   });
 
   final AdminResource resource;
   final Future<bool> Function(Map<String, String> payload) onSubmit;
+  final AdminDashboardController controller;
 
   @override
   State<DefaultCreateDialog> createState() => _DefaultCreateDialogState();
@@ -20,6 +25,10 @@ class _DefaultCreateDialogState extends State<DefaultCreateDialog> {
   final _formKey = GlobalKey<FormState>();
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, String> _isoValues = {}; // Store ISO8601 values separately
+  final Map<String, String?> _foreignKeyValues =
+      {}; // Store selected foreign key values
+  final Map<String, List<Map<String, String>>> _foreignKeyOptions =
+      {}; // Cache foreign key options
   bool _isSubmitting = false;
   String? _errorMessage;
 
@@ -31,6 +40,38 @@ class _DefaultCreateDialogState extends State<DefaultCreateDialog> {
       if (column.isPrimary) continue;
       _controllers[column.name] = TextEditingController();
       _isoValues[column.name] = '';
+      if (column.foreignKeyTable != null) {
+        _foreignKeyValues[column.name] = null;
+        _loadForeignKeyOptions(column);
+      }
+    }
+  }
+
+  Future<void> _loadForeignKeyOptions(AdminColumn column) async {
+    if (column.foreignKeyTable == null) return;
+
+    final relatedResource = ForeignKeyHelper.findRelatedResource(
+      widget.controller,
+      column,
+    );
+
+    if (relatedResource == null) return;
+
+    try {
+      await widget.controller.loadRecords(relatedResource);
+
+      if (mounted) {
+        setState(() {
+          _foreignKeyOptions[column.name] = widget.controller.records;
+        });
+      }
+    } catch (_) {
+      // Failed to load foreign key options, will show empty dropdown
+      if (mounted) {
+        setState(() {
+          _foreignKeyOptions[column.name] = [];
+        });
+      }
     }
   }
 
@@ -42,6 +83,31 @@ class _DefaultCreateDialogState extends State<DefaultCreateDialog> {
     super.dispose();
   }
 
+  Map<String, String> _buildPayload() {
+    final payload = <String, String>{};
+
+    for (final column in widget.resource.columns) {
+      if (column.isPrimary) continue;
+
+      if (column.foreignKeyTable != null) {
+        // Use the selected foreign key value
+        final selectedValue = _foreignKeyValues[column.name];
+        if (selectedValue != null && selectedValue.isNotEmpty) {
+          payload[column.name] = selectedValue;
+        }
+      } else if (_controllers.containsKey(column.name)) {
+        final controller = _controllers[column.name]!;
+        if (_isDateType(column)) {
+          payload[column.name] = _isoValues[column.name] ?? '';
+        } else {
+          payload[column.name] = controller.text.trim();
+        }
+      }
+    }
+
+    return payload;
+  }
+
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -50,21 +116,7 @@ class _DefaultCreateDialogState extends State<DefaultCreateDialog> {
       _errorMessage = null;
     });
 
-    final payload = <String, String>{};
-    for (final entry in _controllers.entries) {
-      final column = widget.resource.columns.firstWhere(
-        (col) => col.name == entry.key,
-      );
-
-      if (_isDateType(column)) {
-        // Use ISO8601 value for date fields
-        final isoValue = _isoValues[entry.key];
-        payload[entry.key] = isoValue ?? '';
-      } else {
-        // Use text value for other fields
-        payload[entry.key] = entry.value.text.trim();
-      }
-    }
+    final payload = _buildPayload();
 
     final success = await widget.onSubmit(payload);
     if (!mounted) return;
@@ -158,8 +210,9 @@ class _DefaultCreateDialogState extends State<DefaultCreateDialog> {
     final theme = Theme.of(context);
 
     return Dialog(
+      backgroundColor: theme.scaffoldBackgroundColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
@@ -168,58 +221,41 @@ class _DefaultCreateDialogState extends State<DefaultCreateDialog> {
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(24),
+                  top: Radius.circular(12),
                 ),
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary.withOpacity(0.1),
-                    theme.colorScheme.primary.withOpacity(0.05),
-                  ],
+                border: Border(
+                  bottom: BorderSide(
+                    color: theme.dividerColor.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
               ),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.add_circle_outline,
-                      color: theme.colorScheme.primary,
-                      size: 28,
-                    ),
+                  Icon(
+                    Icons.add_circle_outline,
+                    color: theme.colorScheme.primary,
+                    size: 24,
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Create ${widget.resource.tableName}',
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Fill in the fields below to create a new record',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      'Create ${widget.resource.tableName}',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   IconButton(
                     onPressed: _isSubmitting
                         ? null
                         : () => Navigator.of(context).pop(false),
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.close, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
               ),
@@ -236,6 +272,29 @@ class _DefaultCreateDialogState extends State<DefaultCreateDialog> {
                           .where((col) => !col.isPrimary)
                           .map((column) {
                         final isDate = _isDateType(column);
+                        final isForeignKey = column.foreignKeyTable != null;
+
+                        // Foreign key dropdown
+                        if (isForeignKey) {
+                          final options = _foreignKeyOptions[column.name] ?? [];
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: ForeignKeyDropdown(
+                              column: column,
+                              controller: widget.controller,
+                              options: options,
+                              value: _foreignKeyValues[column.name],
+                              onChanged: (value) {
+                                setState(() {
+                                  _foreignKeyValues[column.name] = value;
+                                });
+                              },
+                            ),
+                          );
+                        }
+
+                        // Regular text field
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: TextFormField(
@@ -271,13 +330,6 @@ class _DefaultCreateDialogState extends State<DefaultCreateDialog> {
                               filled: true,
                               fillColor:
                                   theme.colorScheme.surfaceContainerHighest,
-                              prefixIcon: column.hasDefault
-                                  ? Icon(
-                                      Icons.settings,
-                                      size: 18,
-                                      color: theme.colorScheme.secondary,
-                                    )
-                                  : null,
                               suffixIcon: isDate
                                   ? IconButton(
                                       icon: const Icon(
@@ -298,39 +350,17 @@ class _DefaultCreateDialogState extends State<DefaultCreateDialog> {
                                         }
                                       },
                                     )
-                                  : column.hasDefault
-                                      ? Container(
-                                          margin:
-                                              const EdgeInsets.only(right: 12),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: theme.colorScheme.secondary
-                                                .withOpacity(0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          child: Text(
-                                            'DEFAULT',
-                                            style: theme.textTheme.labelSmall
-                                                ?.copyWith(
-                                              color:
-                                                  theme.colorScheme.secondary,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        )
-                                      : null,
+                                  : null,
                             ),
                             validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                if (!column.hasDefault) {
-                                  return 'This field is required';
-                                }
+                              if (isForeignKey) {
+                                // Foreign key validation is handled in dropdown
+                                return null;
                               }
-                              if (isDate && value != null && value.isNotEmpty) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'This field is required';
+                              }
+                              if (isDate && value.isNotEmpty) {
                                 // Check if we have a valid ISO value stored
                                 final isoValue = _isoValues[column.name];
                                 if (isoValue == null || isoValue.isEmpty) {
@@ -383,7 +413,8 @@ class _DefaultCreateDialogState extends State<DefaultCreateDialog> {
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.2),
+                    color: theme.dividerColor.withOpacity(0.1),
+                    width: 1,
                   ),
                 ),
               ),

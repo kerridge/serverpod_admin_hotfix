@@ -97,17 +97,50 @@ class AdminEntry<T extends TableRow> extends AdminEntryBase {
     return _fromJson ??= _inferFromJsonForType<T>();
   }
 
-  List<AdminColumn> get _resolvedAdminColumns =>
-      _adminColumns ??= _resolvedTable.columns
-          .map(
-            (column) => AdminColumn(
-              name: column.columnName,
-              dataType: column.type.toString(),
-              hasDefault: column.hasDefault,
-              isPrimary: identical(column, _resolvedTable.id),
-            ),
-          )
-          .toList(growable: false);
+  List<AdminColumn> get _resolvedAdminColumns {
+    if (_adminColumns != null) return _adminColumns!;
+    
+    final foreignKeyMap = _buildForeignKeyMap();
+    
+    return _adminColumns = _resolvedTable.columns
+        .map(
+          (column) => AdminColumn(
+            name: column.columnName,
+            dataType: column.type.toString(),
+            hasDefault: column.hasDefault,
+            isPrimary: identical(column, _resolvedTable.id),
+            foreignKeyTable: foreignKeyMap[column.columnName],
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  /// Builds a map from column names to their referenced foreign key tables.
+  /// Only single-column foreign keys are supported.
+  Map<String, String> _buildForeignKeyMap() {
+    final pod = Serverpod.instance;
+    final tableDefs = pod.serializationManager.getTargetTableDefinitions();
+    final tableName = _resolvedTable.tableName;
+    
+    final tableDef = tableDefs.firstWhere(
+      (def) => def.name == tableName,
+      orElse: () => throw StateError(
+        'serverpod_admin: Table definition not found for "$tableName". '
+        'Ensure the table is properly registered in your Serverpod server.',
+      ),
+    );
+    
+    final foreignKeyMap = <String, String>{};
+    for (final fk in tableDef.foreignKeys) {
+      // Only support single-column foreign keys for now
+      if (fk.columns.length == 1) {
+        final columnName = fk.columns.first;
+        foreignKeyMap[columnName] = fk.referenceTable;
+      }
+    }
+    
+    return foreignKeyMap;
+  }
 }
 
 Table _inferTableForType<T extends TableRow>() {

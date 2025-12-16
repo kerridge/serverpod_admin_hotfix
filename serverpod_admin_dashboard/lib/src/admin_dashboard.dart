@@ -198,10 +198,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         brightness: Brightness.light,
       ).copyWith(surface: surfaceTint, surfaceContainerHighest: Colors.white),
       scaffoldBackgroundColor: surfaceTint,
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        backgroundColor: surfaceTint,
         foregroundColor: Colors.black,
       ),
       cardTheme: CardThemeData(
@@ -219,17 +219,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   ThemeData _buildDarkTheme() {
     const primaryColor = Color(0xFFACA6FF);
+    const darkBackground = Color(0xFF0E101D);
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
         brightness: Brightness.dark,
-      ).copyWith(surface: const Color(0xFF141622)),
-      scaffoldBackgroundColor: const Color(0xFF0E101D),
+      ).copyWith(surface: darkBackground),
+      scaffoldBackgroundColor: darkBackground,
       appBarTheme: const AppBarTheme(
         elevation: 0,
-        backgroundColor: Color(0xFF0E101D),
+        backgroundColor: darkBackground,
         foregroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
       ),
       cardTheme: CardThemeData(
         color: const Color(0xFF181B2C),
@@ -262,6 +264,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           debugShowCheckedModeBanner: false,
           home: Home(
             controller: _controller,
+            title: widget.title,
             customSidebarBuilder: widget.customSidebarBuilder,
             sidebarItemCustomizations: widget.sidebarItemCustomizations,
             customBodyBuilder: widget.customBodyBuilder,

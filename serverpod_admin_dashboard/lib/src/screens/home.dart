@@ -11,6 +11,7 @@ class Home extends StatefulWidget {
   const Home({
     super.key,
     required this.controller,
+    this.title,
     this.customSidebarBuilder,
     this.sidebarItemCustomizations,
     this.customBodyBuilder,
@@ -30,7 +31,7 @@ class Home extends StatefulWidget {
   final DeleteDialogBuilder? customDeleteDialogBuilder;
   final CreateDialogBuilder? customCreateDialogBuilder;
   final FooterBuilder? customFooterBuilder;
-
+  final String? title;
   @override
   State<Home> createState() => _HomeState();
 }
@@ -230,7 +231,7 @@ class _HomeState extends State<Home> {
                     ),
                   )
                 : null,
-            title: const Text('Admin Dashboard'),
+            title: Text(widget.title!),
             actions: [
               IconButton(
                 tooltip: widget.controller.themeMode == ThemeMode.dark
@@ -270,42 +271,29 @@ class _HomeState extends State<Home> {
                 )
               : null,
           body: SafeArea(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0x1A6A5AE0),
-                    Color(0x106A5AE0),
-                    Color(0x006A5AE0),
-                  ],
-                ),
-              ),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1440),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 20),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: isSmallScreen
-                              ? _buildMainContent()
-                              : Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _buildSidebar(),
-                                    const SizedBox(width: 20),
-                                    Expanded(child: _buildMainContent()),
-                                  ],
-                                ),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildFooter(),
-                      ],
-                    ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1440),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: isSmallScreen
+                            ? _buildMainContent()
+                            : Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildSidebar(),
+                                  const SizedBox(width: 20),
+                                  Expanded(child: _buildMainContent()),
+                                ],
+                              ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildFooter(),
+                    ],
                   ),
                 ),
               ),
