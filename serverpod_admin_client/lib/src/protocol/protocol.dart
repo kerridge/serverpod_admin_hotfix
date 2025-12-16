@@ -81,36 +81,31 @@ class Protocol extends _i1.SerializationManager {
     }
     if (t == List<_i5.AdminResource>) {
       return (data as List)
-              .map((e) => deserialize<_i5.AdminResource>(e))
-              .toList()
-          as T;
+          .map((e) => deserialize<_i5.AdminResource>(e))
+          .toList() as T;
     }
     if (t == List<Map<String, String>>) {
       return (data as List)
-              .map((e) => deserialize<Map<String, String>>(e))
-              .toList()
-          as T;
+          .map((e) => deserialize<Map<String, String>>(e))
+          .toList() as T;
     }
     if (t == Map<String, String>) {
       return (data as Map).map(
-            (k, v) => MapEntry(deserialize<String>(k), deserialize<String>(v)),
-          )
-          as T;
+        (k, v) => MapEntry(deserialize<String>(k), deserialize<String>(v)),
+      ) as T;
     }
     if (t == Map<String, dynamic>) {
       return (data as Map).map(
-            (k, v) => MapEntry(deserialize<String>(k), deserialize<dynamic>(v)),
-          )
-          as T;
+        (k, v) => MapEntry(deserialize<String>(k), deserialize<dynamic>(v)),
+      ) as T;
     }
     if (t == _i1.getType<Map<String, dynamic>?>()) {
       return (data != null
-              ? (data as Map).map(
-                  (k, v) =>
-                      MapEntry(deserialize<String>(k), deserialize<dynamic>(v)),
-                )
-              : null)
-          as T;
+          ? (data as Map).map(
+              (k, v) =>
+                  MapEntry(deserialize<String>(k), deserialize<dynamic>(v)),
+            )
+          : null) as T;
     }
     return super.deserialize<T>(data, t);
   }

@@ -87,12 +87,12 @@ class _AdminColumnImpl extends AdminColumn {
     required bool isPrimary,
     String? foreignKeyTable,
   }) : super._(
-         name: name,
-         dataType: dataType,
-         hasDefault: hasDefault,
-         isPrimary: isPrimary,
-         foreignKeyTable: foreignKeyTable,
-       );
+          name: name,
+          dataType: dataType,
+          hasDefault: hasDefault,
+          isPrimary: isPrimary,
+          foreignKeyTable: foreignKeyTable,
+        );
 
   /// Returns a shallow copy of this [AdminColumn]
   /// with some or all fields replaced by the given arguments.
@@ -110,9 +110,8 @@ class _AdminColumnImpl extends AdminColumn {
       dataType: dataType ?? this.dataType,
       hasDefault: hasDefault ?? this.hasDefault,
       isPrimary: isPrimary ?? this.isPrimary,
-      foreignKeyTable: foreignKeyTable is String?
-          ? foreignKeyTable
-          : this.foreignKeyTable,
+      foreignKeyTable:
+          foreignKeyTable is String? ? foreignKeyTable : this.foreignKeyTable,
     );
   }
 }
