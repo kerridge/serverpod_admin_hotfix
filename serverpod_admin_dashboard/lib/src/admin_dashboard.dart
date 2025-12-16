@@ -7,6 +7,7 @@ import 'package:serverpod_admin_dashboard/src/controller/admin_dashboard.dart';
 import 'package:serverpod_admin_dashboard/src/helpers/admin_resources.dart';
 import 'package:serverpod_admin_dashboard/src/screens/home.dart';
 import 'package:serverpod_admin_dashboard/src/screens/home_operations.dart';
+import 'package:serverpod_admin_dashboard/src/screens/login_screen.dart';
 
 /// Lightweight customization for sidebar items.
 /// Allows customizing the label and icon for specific resources by their key.
@@ -124,6 +125,9 @@ class AdminDashboard extends StatefulWidget {
     this.customDeleteDialogBuilder,
     this.customCreateDialogBuilder,
     this.customFooterBuilder,
+    this.onLogin,
+    this.loginTitle,
+    this.loginSubtitle,
   });
 
   final ServerpodClientShared client;
@@ -160,6 +164,17 @@ class AdminDashboard extends StatefulWidget {
   /// and cannot be changed.
   final FooterBuilder? customFooterBuilder;
 
+  /// Optional login callback. If provided, a login screen will be shown first.
+  /// The callback receives username and password and should return true if login
+  /// is successful, false otherwise.
+  final Future<bool> Function(String username, String password)? onLogin;
+
+  /// Login screen title. Defaults to 'Serverpod Admin'.
+  final String? loginTitle;
+
+  /// Login screen subtitle.
+  final String? loginSubtitle;
+
   @override
   State<AdminDashboard> createState() => _AdminDashboardState();
 }
@@ -171,6 +186,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     adminEndpoint: _adminEndpoint,
     initialThemeMode: widget.initialThemeMode,
   );
+  bool _isAuthenticated = false;
 
   admin_client.EndpointAdmin _resolveAdminEndpoint(
     ServerpodClientShared client,
@@ -247,8 +263,23 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   void initState() {
     super.initState();
-    // Kick off initial load.
-    _controller.loadResources();
+    // If no login callback is provided, user is already authenticated
+    if (widget.onLogin == null) {
+      _isAuthenticated = true;
+      _controller.loadResources();
+    }
+  }
+
+  Future<bool> _handleLogin(String username, String password) async {
+    if (widget.onLogin == null) return false;
+    final success = await widget.onLogin!(username, password);
+    if (success && mounted) {
+      setState(() {
+        _isAuthenticated = true;
+      });
+      _controller.loadResources();
+    }
+    return success;
   }
 
   @override
@@ -262,18 +293,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
           theme: _lightTheme,
           darkTheme: _darkTheme,
           debugShowCheckedModeBanner: false,
-          home: Home(
-            controller: _controller,
-            title: widget.title,
-            customSidebarBuilder: widget.customSidebarBuilder,
-            sidebarItemCustomizations: widget.sidebarItemCustomizations,
-            customBodyBuilder: widget.customBodyBuilder,
-            customDetailsBuilder: widget.customDetailsBuilder,
-            customEditDialogBuilder: widget.customEditDialogBuilder,
-            customDeleteDialogBuilder: widget.customDeleteDialogBuilder,
-            customCreateDialogBuilder: widget.customCreateDialogBuilder,
-            customFooterBuilder: widget.customFooterBuilder,
-          ),
+          home: _isAuthenticated
+              ? Home(
+                  controller: _controller,
+                  title: widget.title,
+                  customSidebarBuilder: widget.customSidebarBuilder,
+                  sidebarItemCustomizations: widget.sidebarItemCustomizations,
+                  customBodyBuilder: widget.customBodyBuilder,
+                  customDetailsBuilder: widget.customDetailsBuilder,
+                  customEditDialogBuilder: widget.customEditDialogBuilder,
+                  customDeleteDialogBuilder: widget.customDeleteDialogBuilder,
+                  customCreateDialogBuilder: widget.customCreateDialogBuilder,
+                  customFooterBuilder: widget.customFooterBuilder,
+                )
+              : LoginScreen(
+                  onLogin: _handleLogin,
+                  title: widget.loginTitle ?? 'Serverpod Admin',
+                  subtitle: widget.loginSubtitle,
+                ),
         );
       },
     );
