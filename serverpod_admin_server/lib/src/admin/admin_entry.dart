@@ -99,9 +99,9 @@ class AdminEntry<T extends TableRow> extends AdminEntryBase {
 
   List<AdminColumn> get _resolvedAdminColumns {
     if (_adminColumns != null) return _adminColumns!;
-    
+
     final foreignKeyMap = _buildForeignKeyMap();
-    
+
     return _adminColumns = _resolvedTable.columns
         .map(
           (column) => AdminColumn(
@@ -121,7 +121,7 @@ class AdminEntry<T extends TableRow> extends AdminEntryBase {
     final pod = Serverpod.instance;
     final tableDefs = pod.serializationManager.getTargetTableDefinitions();
     final tableName = _resolvedTable.tableName;
-    
+
     final tableDef = tableDefs.firstWhere(
       (def) => def.name == tableName,
       orElse: () => throw StateError(
@@ -129,7 +129,7 @@ class AdminEntry<T extends TableRow> extends AdminEntryBase {
         'Ensure the table is properly registered in your Serverpod server.',
       ),
     );
-    
+
     final foreignKeyMap = <String, String>{};
     for (final fk in tableDef.foreignKeys) {
       // Only support single-column foreign keys for now
@@ -138,7 +138,7 @@ class AdminEntry<T extends TableRow> extends AdminEntryBase {
         foreignKeyMap[columnName] = fk.referenceTable;
       }
     }
-    
+
     return foreignKeyMap;
   }
 }
