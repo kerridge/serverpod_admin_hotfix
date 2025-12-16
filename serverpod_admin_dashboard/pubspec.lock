@@ -108,7 +108,7 @@ packages:
       path: "../serverpod_admin_client"
       relative: true
     source: path
-    version: "1.0.4"
+    version: "1.0.5"
   serverpod_client:
     dependency: "direct main"
     description:
