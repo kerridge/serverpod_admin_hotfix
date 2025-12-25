@@ -53,9 +53,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!mounted) return;
 
+    // Check if user is superuser or staff
     if (response != null) {
-      // Login successful - update auth state
-      widget.authController.authenticate();
+      final isSuperuser = response.isSuperuser;
+      final isStaff = response.isStaff;
+
+      if (isSuperuser || isStaff) {
+        // Login successful - user has admin access, navigate to dashboard
+        widget.authController.authenticate();
+      } else {
+        // User doesn't have admin privileges
+        _loginController.setError('Access denied. Admin privileges required.');
+      }
     }
   }
 

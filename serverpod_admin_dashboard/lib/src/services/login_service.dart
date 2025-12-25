@@ -24,7 +24,17 @@ class LoginService {
 
   /// Performs login with email and password.
   /// Returns the authentication response containing token, authUserId, etc.
-  Future<Map<String, dynamic>> login(String email, String password) async {
-    return await _adminLoginEndpoint.login(email, password);
+  /// Also sets the authentication token on the client for subsequent requests.
+  Future<admin_client.AdminResponse?> login(
+      String email, String password) async {
+    try {
+      final response = await _adminLoginEndpoint.login(email, password);
+      print('LoginService: Received response: $response');
+      return response;
+    } catch (e, stackTrace) {
+      print('LoginService: Error calling endpoint: $e');
+      print('LoginService: Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 }

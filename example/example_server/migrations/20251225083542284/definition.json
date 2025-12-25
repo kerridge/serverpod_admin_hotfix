@@ -2468,6 +2468,76 @@
     },
     {
       "__className__": "serverpod.TableDefinition",
+      "name": "admin_scope",
+      "dartName": "AdminScope",
+      "module": "serverpod_admin",
+      "schema": "public",
+      "columns": [
+        {
+          "__className__": "serverpod.ColumnDefinition",
+          "name": "id",
+          "columnType": 6,
+          "isNullable": false,
+          "columnDefault": "nextval('admin_scope_id_seq'::regclass)",
+          "dartType": "int?"
+        },
+        {
+          "__className__": "serverpod.ColumnDefinition",
+          "name": "userId",
+          "columnType": 6,
+          "isNullable": false,
+          "dartType": "int"
+        },
+        {
+          "__className__": "serverpod.ColumnDefinition",
+          "name": "isStaff",
+          "columnType": 1,
+          "isNullable": false,
+          "dartType": "bool"
+        },
+        {
+          "__className__": "serverpod.ColumnDefinition",
+          "name": "isSuperuser",
+          "columnType": 1,
+          "isNullable": false,
+          "dartType": "bool"
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "__className__": "serverpod.IndexDefinition",
+          "indexName": "admin_scope_pkey",
+          "elements": [
+            {
+              "__className__": "serverpod.IndexElementDefinition",
+              "type": 0,
+              "definition": "id"
+            }
+          ],
+          "type": "btree",
+          "isUnique": true,
+          "isPrimary": true
+        },
+        {
+          "__className__": "serverpod.IndexDefinition",
+          "indexName": "uniq_user",
+          "elements": [
+            {
+              "__className__": "serverpod.IndexElementDefinition",
+              "type": 0,
+              "definition": "userId"
+            }
+          ],
+          "type": "btree",
+          "isUnique": true,
+          "isPrimary": false
+        }
+      ],
+      "managed": true
+    },
+    {
+      "__className__": "serverpod.TableDefinition",
       "name": "serverpod_auth_core_jwt_refresh_token",
       "dartName": "RefreshToken",
       "module": "serverpod_auth_core",
@@ -2971,7 +3041,7 @@
     {
       "__className__": "serverpod.DatabaseMigrationVersion",
       "module": "example",
-      "version": "20251216052452291"
+      "version": "20251225083542284"
     },
     {
       "__className__": "serverpod.DatabaseMigrationVersion",
@@ -2986,7 +3056,7 @@
     {
       "__className__": "serverpod.DatabaseMigrationVersion",
       "module": "serverpod_admin",
-      "version": "20251216044017986"
+      "version": "20251225051945879"
     },
     {
       "__className__": "serverpod.DatabaseMigrationVersion",

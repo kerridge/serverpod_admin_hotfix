@@ -14,12 +14,14 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
 import 'admin/admin_column.dart' as _i3;
 import 'admin/admin_resource.dart' as _i4;
-import 'admin/admin_scope.dart' as _i5;
-import 'module_class.dart' as _i6;
+import 'admin/admin_response.dart' as _i5;
+import 'admin/admin_scope.dart' as _i6;
+import 'module_class.dart' as _i7;
 import 'package:serverpod_admin_server/src/generated/admin/admin_resource.dart'
-    as _i7;
+    as _i8;
 export 'admin/admin_column.dart';
 export 'admin/admin_resource.dart';
+export 'admin/admin_response.dart';
 export 'admin/admin_scope.dart';
 export 'module_class.dart';
 
@@ -131,11 +133,14 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i4.AdminResource) {
       return _i4.AdminResource.fromJson(data) as T;
     }
-    if (t == _i5.AdminScope) {
-      return _i5.AdminScope.fromJson(data) as T;
+    if (t == _i5.AdminResponse) {
+      return _i5.AdminResponse.fromJson(data) as T;
     }
-    if (t == _i6.ModuleClass) {
-      return _i6.ModuleClass.fromJson(data) as T;
+    if (t == _i6.AdminScope) {
+      return _i6.AdminScope.fromJson(data) as T;
+    }
+    if (t == _i7.ModuleClass) {
+      return _i7.ModuleClass.fromJson(data) as T;
     }
     if (t == _i1.getType<_i3.AdminColumn?>()) {
       return (data != null ? _i3.AdminColumn.fromJson(data) : null) as T;
@@ -143,19 +148,25 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i4.AdminResource?>()) {
       return (data != null ? _i4.AdminResource.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i5.AdminScope?>()) {
-      return (data != null ? _i5.AdminScope.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i5.AdminResponse?>()) {
+      return (data != null ? _i5.AdminResponse.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i6.ModuleClass?>()) {
-      return (data != null ? _i6.ModuleClass.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i6.AdminScope?>()) {
+      return (data != null ? _i6.AdminScope.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i7.ModuleClass?>()) {
+      return (data != null ? _i7.ModuleClass.fromJson(data) : null) as T;
     }
     if (t == List<_i3.AdminColumn>) {
       return (data as List).map((e) => deserialize<_i3.AdminColumn>(e)).toList()
           as T;
     }
-    if (t == List<_i7.AdminResource>) {
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == List<_i8.AdminResource>) {
       return (data as List)
-              .map((e) => deserialize<_i7.AdminResource>(e))
+              .map((e) => deserialize<_i8.AdminResource>(e))
               .toList()
           as T;
     }
@@ -196,8 +207,9 @@ class Protocol extends _i1.SerializationManagerServer {
     return switch (type) {
       _i3.AdminColumn => 'AdminColumn',
       _i4.AdminResource => 'AdminResource',
-      _i5.AdminScope => 'AdminScope',
-      _i6.ModuleClass => 'ModuleClass',
+      _i5.AdminResponse => 'AdminResponse',
+      _i6.AdminScope => 'AdminScope',
+      _i7.ModuleClass => 'ModuleClass',
       _ => null,
     };
   }
@@ -219,9 +231,11 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'AdminColumn';
       case _i4.AdminResource():
         return 'AdminResource';
-      case _i5.AdminScope():
+      case _i5.AdminResponse():
+        return 'AdminResponse';
+      case _i6.AdminScope():
         return 'AdminScope';
-      case _i6.ModuleClass():
+      case _i7.ModuleClass():
         return 'ModuleClass';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -243,11 +257,14 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'AdminResource') {
       return deserialize<_i4.AdminResource>(data['data']);
     }
+    if (dataClassName == 'AdminResponse') {
+      return deserialize<_i5.AdminResponse>(data['data']);
+    }
     if (dataClassName == 'AdminScope') {
-      return deserialize<_i5.AdminScope>(data['data']);
+      return deserialize<_i6.AdminScope>(data['data']);
     }
     if (dataClassName == 'ModuleClass') {
-      return deserialize<_i6.ModuleClass>(data['data']);
+      return deserialize<_i7.ModuleClass>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -265,8 +282,8 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
     switch (t) {
-      case _i5.AdminScope:
-        return _i5.AdminScope.t;
+      case _i6.AdminScope:
+        return _i6.AdminScope.t;
     }
     return null;
   }

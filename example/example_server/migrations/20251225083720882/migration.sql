@@ -1,17 +1,31 @@
 BEGIN;
 
 --
--- ACTION ALTER TABLE
+-- ACTION DROP TABLE
 --
-ALTER TABLE "posts" ADD COLUMN "isPublished" boolean NOT NULL DEFAULT false;
+DROP TABLE "admin_scope" CASCADE;
+
+--
+-- ACTION CREATE TABLE
+--
+CREATE TABLE "admin_scope" (
+    "id" bigserial PRIMARY KEY,
+    "userId" text NOT NULL,
+    "isStaff" boolean NOT NULL,
+    "isSuperuser" boolean NOT NULL
+);
+
+-- Indexes
+CREATE UNIQUE INDEX "uniq_user" ON "admin_scope" USING btree ("userId");
+
 
 --
 -- MIGRATION VERSION FOR example
 --
 INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
-    VALUES ('example', '20251216052452291', now())
+    VALUES ('example', '20251225083720882', now())
     ON CONFLICT ("module")
-    DO UPDATE SET "version" = '20251216052452291', "timestamp" = now();
+    DO UPDATE SET "version" = '20251225083720882', "timestamp" = now();
 
 --
 -- MIGRATION VERSION FOR serverpod
@@ -33,9 +47,9 @@ INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
 -- MIGRATION VERSION FOR serverpod_admin
 --
 INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
-    VALUES ('serverpod_admin', '20251216044017986', now())
+    VALUES ('serverpod_admin', '20251225083629049', now())
     ON CONFLICT ("module")
-    DO UPDATE SET "version" = '20251216044017986', "timestamp" = now();
+    DO UPDATE SET "version" = '20251225083629049', "timestamp" = now();
 
 --
 -- MIGRATION VERSION FOR serverpod_auth_core

@@ -301,7 +301,7 @@
     {
       "__className__": "serverpod.DatabaseMigrationVersion",
       "module": "serverpod_admin",
-      "version": "20251216044017986"
+      "version": "20251225083629049"
     },
     {
       "__className__": "serverpod.DatabaseMigrationVersion",

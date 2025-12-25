@@ -58,7 +58,8 @@ CREATE TABLE "posts" (
     "id" bigserial PRIMARY KEY,
     "title" text NOT NULL,
     "description" text NOT NULL,
-    "date" timestamp without time zone NOT NULL
+    "date" timestamp without time zone NOT NULL,
+    "isPublished" boolean NOT NULL DEFAULT false
 );
 
 --
@@ -408,6 +409,19 @@ CREATE TABLE "serverpod_auth_idp_secret_challenge" (
 );
 
 --
+-- Class AdminScope as table admin_scope
+--
+CREATE TABLE "admin_scope" (
+    "id" bigserial PRIMARY KEY,
+    "userId" text NOT NULL,
+    "isStaff" boolean NOT NULL,
+    "isSuperuser" boolean NOT NULL
+);
+
+-- Indexes
+CREATE UNIQUE INDEX "uniq_user" ON "admin_scope" USING btree ("userId");
+
+--
 -- Class RefreshToken as table serverpod_auth_core_jwt_refresh_token
 --
 CREATE TABLE "serverpod_auth_core_jwt_refresh_token" (
@@ -648,9 +662,9 @@ ALTER TABLE ONLY "serverpod_auth_core_session"
 -- MIGRATION VERSION FOR example
 --
 INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
-    VALUES ('example', '20251216003012828', now())
+    VALUES ('example', '20251225083720882', now())
     ON CONFLICT ("module")
-    DO UPDATE SET "version" = '20251216003012828', "timestamp" = now();
+    DO UPDATE SET "version" = '20251225083720882', "timestamp" = now();
 
 --
 -- MIGRATION VERSION FOR serverpod
@@ -672,9 +686,9 @@ INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
 -- MIGRATION VERSION FOR serverpod_admin
 --
 INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
-    VALUES ('serverpod_admin', '20251115114801095', now())
+    VALUES ('serverpod_admin', '20251225083629049', now())
     ON CONFLICT ("module")
-    DO UPDATE SET "version" = '20251115114801095', "timestamp" = now();
+    DO UPDATE SET "version" = '20251225083629049', "timestamp" = now();
 
 --
 -- MIGRATION VERSION FOR serverpod_auth_core

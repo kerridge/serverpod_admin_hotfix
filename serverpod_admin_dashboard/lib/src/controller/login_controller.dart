@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:serverpod_admin_client/serverpod_admin_client.dart';
 import 'package:serverpod_admin_dashboard/src/services/login_service.dart';
 
 /// Controller for managing login form state.
@@ -46,7 +47,7 @@ class LoginController extends ChangeNotifier {
 
   /// Performs login using the login service.
   /// Returns the authentication response if successful, null otherwise.
-  Future<Map<String, dynamic>?> performLogin() async {
+  Future<AdminResponse?> performLogin() async {
     if (usernameController.text.trim().isEmpty ||
         passwordController.text.isEmpty) {
       setError('Email and password are required');
@@ -57,14 +58,19 @@ class LoginController extends ChangeNotifier {
     setLoading(true);
 
     try {
-      final response = await loginService.login(
+      final AdminResponse? response = await loginService.login(
         usernameController.text.trim(),
         passwordController.text,
       );
       setLoading(false);
+      // Log the response for debugging
+      print('Login response: $response');
       return response;
-    } catch (e) {
+    } catch (e, stackTrace) {
       setLoading(false);
+      // Log the error for debugging
+      print('Login error: $e');
+      print('Stack trace: $stackTrace');
       setError('Invalid email or password. Please try again.');
       return null;
     }
