@@ -13,7 +13,8 @@ import 'src/web/routes/root.dart';
 void run(List<String> args) async {
   // Initialize Serverpod and connect it with your generated code.
   final pod = Serverpod(args, Protocol(), Endpoints());
-
+  print(pod.config.apiServer.port);
+  print(pod.config.apiServer.publicHost);
   // Initialize authentication services for the server.
   // Token managers will be used to validate and issue authentication keys,
   // and the identity providers will be the authentication options available for users.
@@ -68,3 +69,6 @@ void _sendPasswordResetCode(
   // the user. For testing, we will just log the verification code.
   session.log('[EmailIdp] Password reset code ($email): $verificationCode');
 }
+
+
+// {"className":"serverpod_auth_idp.EmailAccountLoginException","data":{"__className__":"serverpod_auth_idp.EmailAccountLoginException","reason":"invalidCredentials"}}%
