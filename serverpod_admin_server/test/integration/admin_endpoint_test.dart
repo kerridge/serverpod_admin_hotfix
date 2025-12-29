@@ -1,6 +1,5 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_admin_server/serverpod_admin_server.dart';
-import 'package:serverpod_test/serverpod_test.dart';
 import 'package:test/test.dart';
 
 import 'test_tools/serverpod_test_tools.dart';

@@ -21,7 +21,7 @@ class AdminRegistry {
   /// Registers a new table row type. Table metadata and JSON serialization can
   /// be provided explicitly, but if omitted, they will be resolved from the
   /// host server's [SerializationManager]. This lets host projects register
-  /// resources with a simple [register]<T>() call.
+  /// resources with a simple `register<T>()` call.
   void register<T extends TableRow>({
     Table? table,
     T Function(JsonMap json)? fromJson,
@@ -38,14 +38,20 @@ class AdminRegistry {
     final entry = AdminEntry<T>(
       table: table,
       fromJson: fromJson,
+      // ignore: invalid_use_of_internal_member
       listRows: listRows ?? (session) => session.db.find<T>(),
+      // ignore: invalid_use_of_internal_member
       findRowById: findRowById ?? (session, id) => session.db.findById<T>(id),
+      // ignore: invalid_use_of_internal_member
       createRow: createRow ?? (session, row) => session.db.insertRow<T>(row),
+      // ignore: invalid_use_of_internal_member
       updateRow: updateRow ?? (session, row) => session.db.updateRow<T>(row),
       deleteById: deleteById ??
           (session, id) async {
+            // ignore: invalid_use_of_internal_member
             final row = await session.db.findById<T>(id);
             if (row != null) {
+              // ignore: invalid_use_of_internal_member
               await session.db.deleteRow<T>(row);
             }
           },
