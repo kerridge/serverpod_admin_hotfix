@@ -56,12 +56,13 @@ jobs:
           # Update test.yaml to use standard ports for GitHub Actions
           sed -i 's/port: 9090/port: 5432/' config/test.yaml
           sed -i 's/port: 9091/port: 6379/' config/test.yaml
-          sed -i 's/enabled: false/enabled: true/' config/test.yaml
-          # Update passwords.yaml with CI password (postgres for database, empty for redis)
+          # Keep Redis disabled for CI since GitHub Actions Redis doesn't require password
+          # but Serverpod tries to authenticate when enabled
+          # sed -i 's/enabled: false/enabled: true/' config/test.yaml
+          # Update passwords.yaml with CI password (postgres for database, no redis password)
           cat > config/passwords.yaml << EOF
           test:
             database: 'postgres'
-            redis: ''
           EOF
 
       - name: Analyze server source
@@ -83,7 +84,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.30.0'
+          flutter-version: 'latest'
           channel: 'stable'
 
       - name: Install dependencies

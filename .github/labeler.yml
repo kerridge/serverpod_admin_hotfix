@@ -1,0 +1,49 @@
+# Configuration for automatic labeling of PRs and Issues
+
+# Labels for pull requests based on changed files
+'server':
+  - 'serverpod_admin_server/**'
+
+'dashboard':
+  - 'serverpod_admin_dashboard/**'
+
+'client':
+  - 'serverpod_admin_client/**'
+
+'example':
+  - 'example/**'
+
+'ci/cd':
+  - '.github/**'
+
+'documentation':
+  - '*.md'
+  - '**/*.md'
+  - 'README.md'
+  - 'CHANGELOG.md'
+  - 'LICENSE'
+
+# Labels based on PR title patterns and file changes
+'bug':
+  - title: '(?i).*(bug|fix|error|issue|broken|crash|fail).*'
+  - body: '(?i).*(bug|error|issue|broken|crash|fail|exception).*'
+
+'enhancement':
+  - title: '(?i).*(feat|feature|add|new|improve|enhance).*'
+  - body: '(?i).*(feat|feature|add|new|improve|enhance|request).*'
+
+'refactor':
+  - title: '(?i).*(refactor|cleanup|restructure|reorganize).*'
+
+'test':
+  - title: '(?i).*(test|spec|coverage).*'
+  - '**/*test*.dart'
+  - '**/test/**'
+
+'chore':
+  - title: '(?i).*(chore|deps|dependencies|bump|update).*'
+
+'question':
+  - body: '(?i).*(question|how|why|what|help|support).*'
+  - title: '(?i).*(question|how|why|what|help).*'
+
